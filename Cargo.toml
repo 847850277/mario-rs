@@ -1,6 +1,16 @@
-[package]
+[workspace.package]
 name = "mario-rs"
 version = "0.1.0"
 edition = "2021"
 
-[dependencies]
+#[dependencies]
+[workspace]
+members = [
+    "mario-core",
+    "mario-rs-examples",
+]
+
+[workspace.dependencies]
+mario-core = { path = "mario-core" }
+tokio = { version = "1.39.3", features = ["full"] }
+anyhow = "1.0"
