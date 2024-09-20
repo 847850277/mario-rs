@@ -14,3 +14,5 @@ members = [
 mario-core = { path = "mario-core" }
 tokio = { version = "1.39.3", features = ["full"] }
 anyhow = "1.0"
+http = { version = "1", default-features = false }
+hyper = { version = "1", default-features = false }

@@ -5,3 +5,5 @@ edition.workspace = true
 
 [dependencies]
 tokio.workspace = true
+http.workspace = true
+hyper.workspace = true
