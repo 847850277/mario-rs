@@ -9,6 +9,7 @@ members = [
     "mario-core",
     "mario-rs-examples",
 ]
+resolver = "2"
 
 [workspace.dependencies]
 mario-core = { path = "mario-core" }
@@ -16,3 +17,10 @@ tokio = { version = "1.39.3", features = ["full"] }
 anyhow = "1.0"
 http = { version = "1", default-features = false }
 hyper = { version = "1", default-features = false }
+hyper-util = { version = "0.1.8", features = ["full"] }
+tracing = "0.1.27"
+http-body = "1"
+http-body-util = "0.1"
+regex = "1.10.6"
+bytes = "1.7.2"
+log = "0.4.22"

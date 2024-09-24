@@ -1,14 +1,22 @@
-use tokio::net::TcpListener;
+use std::convert::Infallible;
+
+use bytes::Bytes;
+use http::Request;
+use http_body_util::Full;
+use hyper::Response;
+use hyper::service::service_fn;
+use hyper_util::rt::{TokioExecutor, TokioIo};
+use hyper_util::server::conn::auto::Builder;
+use tokio::net::{TcpListener, TcpStream};
+use tracing::info;
 
 pub struct Server {
 
 }
 
 impl Server {
-
     pub fn new() -> Server {
-        Server{
-        }
+        Server {}
     }
 
     pub(crate) async fn start_server(&self) {
@@ -18,12 +26,27 @@ impl Server {
         println!("Server running on {}", listener.local_addr().unwrap());
         loop {
             let (stream, _) = listener.accept().await.unwrap();
-            // let router = Arc::clone(&self.router); // Clone the router to use in the spawned task
-            // tokio::spawn(async move {
-            //     handle_connection(stream,router).await;
-            // });
+            tokio::spawn(async move {
+                handle_connection(stream).await;
+            });
         }
     }
+}
+
+
+async fn hello(request: Request<impl hyper::body::Body + std::fmt::Debug>) -> Result<Response<Full<Bytes>>, Infallible> {
+    println!("Request: {:?}", request);
+    Ok(Response::new(Full::new(Bytes::from("Hello World!"))))
+}
+
+
+pub async fn handle_connection(mut stream: TcpStream) {
+
+    let tcp_stream = TokioIo::new(stream);
+    tokio::spawn(async move {
+        let builder = Builder::new(TokioExecutor::new());
+        builder.serve_connection(tcp_stream, service_fn(hello)).await.unwrap();
+    });
 
 }
 
