@@ -9,6 +9,8 @@ use hyper_util::rt::{TokioExecutor, TokioIo};
 use hyper_util::server::conn::auto::Builder;
 use tokio::net::{TcpListener, TcpStream};
 use crate::route::request::Request as MarioRequest;
+use crate::route::route::Route;
+use crate::route::route_matcher::RouteMatcher;
 
 pub struct Server {
 
@@ -35,12 +37,9 @@ impl Server {
 
 
 async fn dispatch(request: Request<hyper::body::Incoming>) -> Result<Response<Full<Bytes>>, Infallible> {
-    //println!("Request: {:?}", request);
     let request = MarioRequest::new(request);
-    println!("Request: {:?}", request);
-    // request.headers().iter().for_each(|(key, value)| {
-    //     println!("{}: {}", key, value.to_str().unwrap());
-    // });
+    let matcher = RouteMatcher::new(vec![]);
+    let route = matcher.match_route(request);
     Ok(Response::new(Full::new(Bytes::from("Hello World!"))))
 }
 
