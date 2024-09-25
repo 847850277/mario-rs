@@ -8,7 +8,7 @@ use hyper::service::service_fn;
 use hyper_util::rt::{TokioExecutor, TokioIo};
 use hyper_util::server::conn::auto::Builder;
 use tokio::net::{TcpListener, TcpStream};
-use tracing::info;
+use crate::route::request::Request as MarioRequest;
 
 pub struct Server {
 
@@ -34,8 +34,13 @@ impl Server {
 }
 
 
-async fn hello(request: Request<impl hyper::body::Body + std::fmt::Debug>) -> Result<Response<Full<Bytes>>, Infallible> {
+async fn dispatch(request: Request<hyper::body::Incoming>) -> Result<Response<Full<Bytes>>, Infallible> {
+    //println!("Request: {:?}", request);
+    let request = MarioRequest::new(request);
     println!("Request: {:?}", request);
+    // request.headers().iter().for_each(|(key, value)| {
+    //     println!("{}: {}", key, value.to_str().unwrap());
+    // });
     Ok(Response::new(Full::new(Bytes::from("Hello World!"))))
 }
 
@@ -45,7 +50,7 @@ pub async fn handle_connection(mut stream: TcpStream) {
     let tcp_stream = TokioIo::new(stream);
     tokio::spawn(async move {
         let builder = Builder::new(TokioExecutor::new());
-        builder.serve_connection(tcp_stream, service_fn(hello)).await.unwrap();
+        builder.serve_connection(tcp_stream, service_fn(dispatch)).await.unwrap();
     });
 
 }
