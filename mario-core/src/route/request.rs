@@ -11,8 +11,6 @@ pub struct Request {
 impl Request {
     pub fn new(
         request: http::Request<hyper::body::Incoming>,
-        //local_addr: SocketAddr,
-        //remote_addr: SocketAddr,
     ) -> Self {
         let (
             Parts {
