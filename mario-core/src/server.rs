@@ -61,8 +61,16 @@ async fn dispatch(request: Request<hyper::body::Incoming>) -> Result<Response<Fu
         Some(route) => {
             info!("Route found: {:?}", route);
             let response = route.handler.handler(&request);
-            info!("Response: {:?}", response);
-            return  Ok(Response::new(Full::new(Bytes::from("Hello World!"))))
+            //info!("Response: {:?}", response);
+            match response {
+                Ok(response) => {
+                    let body = response.body().to_string();
+                    return Ok(Response::new(Full::new(Bytes::from(body))))
+                },
+                Err(_) => {
+                    return Ok(Response::new(Full::new(Bytes::from("500 Internal Server Error"))));
+                }
+            }
         },
         None => {
             return Ok(Response::new(Full::new(Bytes::from("404 Not Found"))));
