@@ -1,11 +1,14 @@
+use std::fmt::Debug;
 use crate::route::error::Error;
 use crate::route::request::Request;
 use crate::route::response::Response;
 
-pub trait Handler {
-    fn handle(&self, req: Request) -> Result<Response, Error>;
+pub trait Handler: Debug {
+    //fn handle(&self, req: Request) -> Result<Response, Error>;
+    fn handler(&self, req: &Request) -> Result<Response, Error>;
 }
 
+#[derive(Debug)]
 pub struct MyHandler;
 
 impl MyHandler {
@@ -14,8 +17,9 @@ impl MyHandler {
     }
 }
 
+
 impl Handler for MyHandler {
-    fn handle(&self, req: Request) -> Result<Response, Error> {
+    fn handler(&self, req: &Request) -> Result<Response, Error> {
         // Your implementation here
         Ok(Response::new("run my handler"))
     }

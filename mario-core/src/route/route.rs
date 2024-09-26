@@ -11,6 +11,7 @@ pub struct Route{
 
 impl Debug for Route {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Route: {:?} {}", self.http_method, self.path)
+        //write!(f, "Route: {:?} {}", self.http_method, self.path)
+        write!(f, "Route: {:?} {} {:?}", self.http_method, self.path, self.handler)
     }
 }

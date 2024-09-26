@@ -7,8 +7,8 @@ use hyper::Response;
 use hyper::service::service_fn;
 use hyper_util::rt::{TokioExecutor, TokioIo};
 use hyper_util::server::conn::auto::Builder;
-use log::info;
 use tokio::net::{TcpListener, TcpStream};
+use tracing::info;
 use crate::route::handler::MyHandler;
 use crate::route::request::Request as MarioRequest;
 use crate::route::route::Route;
@@ -56,10 +56,12 @@ async fn dispatch(request: Request<hyper::body::Incoming>) -> Result<Response<Fu
     let matcher = RouteMatcher::new(vec![
         route!(Method::GET, "/hello_world", MyHandler::new()),
     ]);
-    let route = matcher.match_route(request);
+    let route = matcher.match_route(&request);
     match route {
         Some(route) => {
-            println!("route matched {:?}", route);
+            info!("Route found: {:?}", route);
+            let response = route.handler.handler(&request);
+            info!("Response: {:?}", response);
             return  Ok(Response::new(Full::new(Bytes::from("Hello World!"))))
         },
         None => {
