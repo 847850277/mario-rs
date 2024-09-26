@@ -8,6 +8,15 @@ pub struct Request {
     pub body: Incoming,
 }
 
+// impl Clone for Request {
+//     fn clone(&self) -> Self {
+//         Self {
+//             head: self.head.clone(),
+//             body: self.body.clone(),
+//         }
+//     }
+// }
+
 impl Request {
     pub fn new(
         request: http::Request<hyper::body::Incoming>,
@@ -56,3 +65,15 @@ pub struct Head {
 
 }
 
+
+impl Clone for Head {
+    fn clone(&self) -> Self {
+        Self {
+            method: self.method.clone(),
+            uri: self.uri.clone(),
+            version: self.version.clone(),
+            headers: self.headers.clone(),
+            extensions: self.extensions.clone(),
+        }
+    }
+}
