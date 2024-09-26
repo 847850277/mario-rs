@@ -6,3 +6,4 @@ edition.workspace = true
 [dependencies]
 tokio.workspace = true
 mario-core = { workspace = true }
+tracing-subscriber = "0.3.18"
