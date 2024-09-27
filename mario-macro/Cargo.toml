@@ -1,0 +1,11 @@
+[package]
+name = "mario-macro"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+log = "0.4.22"
+
+
+[lib]
+proc-macro = true
