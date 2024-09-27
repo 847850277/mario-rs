@@ -1,12 +1,15 @@
 use std::fmt::Debug;
 use http::Method;
 use crate::route::handler::Handler;
+use log::info;
 
 pub struct Route{
     pub http_method: Method,
     pub path: String,
     pub handler: Box<dyn Handler>,
 }
+
+
 
 
 impl Debug for Route {
