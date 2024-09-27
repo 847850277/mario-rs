@@ -3,9 +3,10 @@ use crate::route::error::Error;
 use crate::route::request::Request;
 use crate::route::response::Response;
 
-pub trait Handler: Debug {
+pub trait Handler: Debug + Sync + Send  {
     //fn handle(&self, req: Request) -> Result<Response, Error>;
     fn handler(&self, req: &Request) -> Result<Response, Error>;
+
 }
 
 #[derive(Debug)]
@@ -23,4 +24,5 @@ impl Handler for MyHandler {
         // Your implementation here
         Ok(Response::new("run my handler"))
     }
+
 }

@@ -1,26 +1,27 @@
+use std::sync::Arc;
 use crate::route::request::Request;
 use crate::route::route::Route;
 
 pub struct RouteMatcher {
-    routes: Vec<Route>,
+    routes: Arc<Vec<Route>>,
 }
 
 
 
 impl RouteMatcher {
-    pub fn new(routes: Vec<Route>) -> Self {
+    pub fn new(routes: Arc<Vec<Route>>) -> Self {
         Self {
             routes,
         }
     }
 
-    pub fn set_routes(&mut self, routes: Vec<Route>) {
+    pub fn set_routes(&mut self, routes: Arc<Vec<Route>>) {
         self.routes = routes;
     }
 
 
     pub(crate) fn match_route(&self,req: &Request) -> Option<&Route> {
-        for route in &self.routes {
+        for route in self.routes.as_ref() {
             if route.http_method == req.head.method && route.path == req.head.uri.path() {
                 return Some(route);
             }

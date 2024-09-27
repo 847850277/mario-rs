@@ -9,3 +9,4 @@ mario-core = { workspace = true }
 mario-macro = { workspace = true }
 tracing-subscriber = "0.3.18"
 log = "0.4.22"
+http.workspace = true
