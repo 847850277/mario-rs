@@ -1,19 +1,19 @@
 use std::convert::Infallible;
 use std::sync::Arc;
 
-use bytes::Bytes;
-use http::{Method, Request};
-use http_body_util::Full;
-use hyper::Response;
-use hyper::service::service_fn;
-use hyper_util::rt::{TokioExecutor, TokioIo};
-use hyper_util::server::conn::auto::Builder;
-use tokio::net::{TcpListener, TcpStream};
-use tracing::info;
 use crate::route::handler::MyHandler;
 use crate::route::request::Request as MarioRequest;
 use crate::route::route::Route;
 use crate::route::route_matcher::RouteMatcher;
+use bytes::Bytes;
+use http::{Method, Request};
+use http_body_util::Full;
+use hyper::service::service_fn;
+use hyper::Response;
+use hyper_util::rt::{TokioExecutor, TokioIo};
+use hyper_util::server::conn::auto::Builder;
+use tokio::net::{TcpListener, TcpStream};
+use tracing::info;
 
 pub struct Server {
     pub routes: Vec<Route>,
@@ -31,9 +31,7 @@ macro_rules! route {
 
 impl Server {
     pub fn new() -> Server {
-        Server {
-            routes: vec![],
-        }
+        Server { routes: vec![] }
     }
 
     pub fn bind_route(&mut self, route: Route) {
@@ -55,14 +53,16 @@ impl Server {
             //let routes = self.get_routes();
             let routes = Arc::clone(&routes);
             tokio::spawn(async move {
-                handle_connection(routes,stream).await;
+                handle_connection(routes, stream).await;
             });
         }
     }
 }
 
-
-async fn dispatch(routes: Arc<Vec<Route>>,request: Request<hyper::body::Incoming>) -> Result<Response<Full<Bytes>>, Infallible> {
+async fn dispatch(
+    routes: Arc<Vec<Route>>,
+    request: Request<hyper::body::Incoming>,
+) -> Result<Response<Full<Bytes>>, Infallible> {
     let request = MarioRequest::new(request);
 
     // let matcher = RouteMatcher::new(vec![
@@ -78,13 +78,15 @@ async fn dispatch(routes: Arc<Vec<Route>>,request: Request<hyper::body::Incoming
             match response {
                 Ok(response) => {
                     let body = response.body().to_string();
-                    return Ok(Response::new(Full::new(Bytes::from(body))))
-                },
+                    return Ok(Response::new(Full::new(Bytes::from(body))));
+                }
                 Err(_) => {
-                    return Ok(Response::new(Full::new(Bytes::from("500 Internal Server Error"))));
+                    return Ok(Response::new(Full::new(Bytes::from(
+                        "500 Internal Server Error",
+                    ))));
                 }
             }
-        },
+        }
         None => {
             return Ok(Response::new(Full::new(Bytes::from("404 Not Found"))));
         }
@@ -92,14 +94,16 @@ async fn dispatch(routes: Arc<Vec<Route>>,request: Request<hyper::body::Incoming
     Ok(Response::new(Full::new(Bytes::from("Hello World!"))))
 }
 
-
-pub async fn handle_connection(routes: Arc<Vec<Route>>,stream: TcpStream) {
-
+pub async fn handle_connection(routes: Arc<Vec<Route>>, stream: TcpStream) {
     let tcp_stream = TokioIo::new(stream);
     tokio::spawn(async move {
         let builder = Builder::new(TokioExecutor::new());
-        builder.serve_connection(tcp_stream, service_fn(|req|dispatch(Arc::clone(&routes),req))).await.unwrap();
+        builder
+            .serve_connection(
+                tcp_stream,
+                service_fn(|req| dispatch(Arc::clone(&routes), req)),
+            )
+            .await
+            .unwrap();
     });
-
 }
-

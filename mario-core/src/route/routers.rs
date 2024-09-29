@@ -1,23 +1,21 @@
-use std::sync::Arc;
 use crate::route::route::Route;
+use std::sync::Arc;
 
-pub struct Routers{
+pub struct Routers {
     routes: Vec<Arc<Route>>,
 }
 impl Routers {
     pub fn new() -> Self {
-        Self {
-            routes: Vec::new(),
-        }
+        Self { routes: Vec::new() }
     }
 
     pub fn add_route(&mut self, route: Arc<Route>) {
         self.routes.push(route.clone());
         println!("Add Route: {:?}", route);
     }
-
     pub fn remove_route(&mut self, route_to_remove: Arc<Route>) {
-        self.routes.retain(|route| !Arc::ptr_eq(route, &route_to_remove));
+        self.routes
+            .retain(|route| !Arc::ptr_eq(route, &route_to_remove));
     }
 
     pub fn get_routes(&self) -> &Vec<Arc<Route>> {
@@ -28,4 +26,3 @@ impl Routers {
         self.routes = routes;
     }
 }
-

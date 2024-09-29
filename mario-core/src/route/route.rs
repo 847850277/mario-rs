@@ -5,7 +5,7 @@ use http::Method;
 
 use crate::route::handler::{Handler, MyHandler};
 
-pub struct Route{
+pub struct Route {
     pub http_method: Method,
     pub path: String,
     pub handler: Arc<Box<dyn Handler>>,
@@ -21,7 +21,6 @@ impl Clone for Route {
     }
 }
 
-
 impl Route {
     pub fn new(http_method: Method, path: String, handler: Arc<Box<dyn Handler>>) -> Self {
         Self {
@@ -35,6 +34,10 @@ impl Route {
 impl Debug for Route {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         //write!(f, "Route: {:?} {}", self.http_method, self.path)
-        write!(f, "Route: {:?} {} {:?}", self.http_method, self.path, self.handler)
+        write!(
+            f,
+            "Route: {:?} {} {:?}",
+            self.http_method, self.path, self.handler
+        )
     }
 }

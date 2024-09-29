@@ -1,5 +1,5 @@
-use proc_macro::TokenStream;
 use log::info;
+use proc_macro::TokenStream;
 
 #[proc_macro_attribute]
 pub fn route(_attr: TokenStream, item: TokenStream) -> TokenStream {

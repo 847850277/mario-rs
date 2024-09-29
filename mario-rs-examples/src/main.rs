@@ -1,10 +1,10 @@
-use std::sync::Arc;
-use log::info;
 use http::{Method, Request};
+use log::info;
 use mario_core::mario_server::MarioServer;
 use mario_core::route::handler::{Handler, MyHandler};
 use mario_core::route::response::Response;
 use mario_core::route::route::Route;
+use std::sync::Arc;
 
 use mario_macro::route;
 
@@ -25,4 +25,3 @@ pub async fn main() {
     server.server.bind_route(route);
     server.start().await;
 }
-
