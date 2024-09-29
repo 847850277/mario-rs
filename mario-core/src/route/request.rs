@@ -1,5 +1,5 @@
-use http::{Extensions, HeaderMap, HeaderValue, Method, Uri, Version};
 use http::request::Parts;
+use http::{Extensions, HeaderMap, HeaderValue, Method, Uri, Version};
 use hyper::body::Incoming;
 
 #[derive(Debug)]
@@ -8,19 +8,8 @@ pub struct Request {
     pub body: Incoming,
 }
 
-// impl Clone for Request {
-//     fn clone(&self) -> Self {
-//         Self {
-//             head: self.head.clone(),
-//             body: self.body.clone(),
-//         }
-//     }
-// }
-
 impl Request {
-    pub fn new(
-        request: http::Request<hyper::body::Incoming>,
-    ) -> Self {
+    pub fn new(request: http::Request<hyper::body::Incoming>) -> Self {
         let (
             Parts {
                 method,
@@ -44,8 +33,6 @@ impl Request {
             body,
         }
     }
-
-
 }
 
 #[derive(Debug)]
@@ -64,9 +51,7 @@ pub struct Head {
 
     /// The request's extensions
     pub extensions: Extensions,
-
 }
-
 
 impl Clone for Head {
     fn clone(&self) -> Self {

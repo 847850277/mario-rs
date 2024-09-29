@@ -1,4 +1,2 @@
 #[derive(Debug)]
-pub struct Error {
-
-}
+pub struct Error {}

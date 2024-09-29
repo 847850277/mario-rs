@@ -14,5 +14,4 @@ impl MarioServer {
     pub async fn start(&self) {
         self.server.start_server().await;
     }
-
 }
