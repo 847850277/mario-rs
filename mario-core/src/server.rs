@@ -51,6 +51,7 @@ impl Server {
         let routes = Arc::new(self.get_routes());
         //TODO init routes
         loop {
+
             let (stream, _) = listener.accept().await.unwrap();
             //let routes = self.get_routes();
             let routes = Arc::clone(&routes);
