@@ -3,7 +3,7 @@ use crate::route::request::Request;
 use crate::route::response::Response;
 use std::fmt::Debug;
 
-pub trait Handler: Debug + Sync + Send {
+pub trait Endpoint: Debug + Sync + Send {
     //fn handle(&self, req: Request) -> Result<Response, Error>;
     fn handler(&self, req: &Request) -> Result<Response, Error>;
 }
@@ -17,7 +17,7 @@ impl MyHandler {
     }
 }
 
-impl Handler for MyHandler {
+impl Endpoint for MyHandler {
     fn handler(&self, req: &Request) -> Result<Response, Error> {
         // Your implementation here
         Ok(Response::new("run my handler"))

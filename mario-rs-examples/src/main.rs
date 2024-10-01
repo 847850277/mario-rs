@@ -3,7 +3,7 @@ use http::{Method, Request};
 use log::info;
 use mario_core::mario_server::MarioServer;
 use mario_core::route::error::Error;
-use mario_core::route::handler::{Handler, MyHandler};
+use mario_core::route::handler::{Endpoint, MyHandler};
 use mario_core::route::response::Response;
 use mario_core::route::route::Route;
 use std::sync::Arc;
@@ -31,7 +31,7 @@ impl ExampleHandler {
     }
 }
 
-impl Handler for ExampleHandler {
+impl Endpoint for ExampleHandler {
     fn handler(&self, req: &mario_core::route::request::Request) -> Result<Response, Error> {
         // Your implementation here
         //Ok(Response::new("run example handler"))
@@ -48,7 +48,7 @@ pub async fn main() {
     let response = example().await;
     info!("{:?}", response);
     let mut server = MarioServer::new();
-    let handler = Arc::new(Box::new(ExampleHandler::new()) as Box<dyn Handler>);
+    let handler = Arc::new(Box::new(ExampleHandler::new()) as Box<dyn Endpoint>);
     let route = Route::new(http::Method::GET, "/hello_world".to_string(), handler);
     server.server.bind_route(route);
     server.start().await;

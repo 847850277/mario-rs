@@ -3,12 +3,12 @@ use std::sync::Arc;
 
 use http::Method;
 
-use crate::route::handler::{Handler, MyHandler};
+use crate::route::handler::{Endpoint, MyHandler};
 
 pub struct Route {
     pub http_method: Method,
     pub path: String,
-    pub handler: Arc<Box<dyn Handler>>,
+    pub handler: Arc<Box<dyn Endpoint>>,
 }
 
 impl Clone for Route {
@@ -22,7 +22,7 @@ impl Clone for Route {
 }
 
 impl Route {
-    pub fn new(http_method: Method, path: String, handler: Arc<Box<dyn Handler>>) -> Self {
+    pub fn new(http_method: Method, path: String, handler: Arc<Box<dyn Endpoint>>) -> Self {
         Self {
             http_method,
             path,
