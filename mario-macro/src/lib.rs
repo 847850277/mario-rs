@@ -16,23 +16,33 @@ pub fn handler(
 }
 
 fn generate_handler(_args: TokenStream, input: TokenStream) -> syn::Result<TokenStream> {
+
+    let item_fn = syn::parse::<ItemFn>(input)?;
+    let vis = &item_fn.vis;
+    let ident = &item_fn.sig.ident;
+
+
     let expanded = quote! {
+
         #[derive(Debug)]
-        struct example_2;
-        impl example_2 {
+        #vis struct #ident;
+
+        impl #ident {
             pub fn new() -> Self {
                 Self
             }
         }
-        impl Endpoint for example_2 {
+
+        impl Endpoint for #ident {
             fn handler(&self, req: &mario_core::route::request::Request) -> Result<Response, Error> {
                 // Your implementation here
                 //Ok(Response::new("run example handler"))
-                async fn example_1() -> String {
-                    //Ok(Response::new("run example_1"))
-                    "run example_2".to_string()
-                }
-                let fut = example_1();
+                // async fn example_2() -> String {
+                //     //Ok(Response::new("run example_1"))
+                //     "run example_2".to_string()
+                // }
+                #item_fn
+                let fut = #ident();
                 let response = executor::block_on(fut);
                 Ok(Response::new(&response))
             }

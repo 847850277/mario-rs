@@ -82,9 +82,9 @@ impl Endpoint for ExampleHandler {
 // }
 
 #[handler]
-async fn example_2() -> String {
+async fn example_999() -> String {
     //Ok(Response::new("run example_1"))
-    "run example_2".to_string()
+    "run example_99999".to_string()
 }
 
 #[tokio::main]
@@ -98,7 +98,7 @@ pub async fn main() {
     //let handler = create_handler!(ExampleHandler);
     let route = Route::new(http::Method::GET, "/hello_world".to_string(), handler);
 
-    let handler_1 = create_handler!(example_2);
+    let handler_1 = create_handler!(example_999);
     let route_1 = Route::new(http::Method::GET, "/hello_world_2".to_string(), handler_1);
 
     server.server.bind_route(route);
