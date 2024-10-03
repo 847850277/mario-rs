@@ -16,12 +16,9 @@ pub fn handler(
 }
 
 fn generate_handler(_args: TokenStream, input: TokenStream) -> syn::Result<TokenStream> {
-
     let item_fn = syn::parse::<ItemFn>(input)?;
     let vis = &item_fn.vis;
     let ident = &item_fn.sig.ident;
-
-
     let expanded = quote! {
 
         #[derive(Debug)]
