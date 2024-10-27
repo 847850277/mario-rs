@@ -84,6 +84,10 @@ impl Endpoint for ExampleHandler {
 #[handler]
 async fn example_999() -> String {
     //Ok(Response::new("run example_1"))
+    // info about the request can be accessed via the `req` parameter
+    // info hello world
+    let a = 1;
+    info!("hello world");
     "run example_99999".to_string()
 }
 
