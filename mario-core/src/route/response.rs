@@ -1,17 +1,23 @@
-#[derive(Debug, Clone)]
-pub struct Response {
-    body: String,
+//#[derive(Debug, Clone)]
+pub struct Response<T> {
+    body: T,
 }
 
-impl Response {
-    pub fn new(body: &str) -> Self {
-        Self {
-            body: body.to_string(),
-        }
+impl<T: std::fmt::Debug> Response<T> {
+    fn as_text(&self) -> String {
+        return format!("{:?}", self.body);
+    }
+}
+
+impl<T> Response<T> {
+    pub fn new(body: T) -> Response<T> {
+        Response { body }
+    }
+    pub fn set_body(&mut self, body: T) {
+        self.body = body;
     }
 
-    //get body
-    pub fn body(&self) -> &str {
-        &self.body
+    pub fn get_body(&self) -> &T {
+        return &self.body;
     }
 }
