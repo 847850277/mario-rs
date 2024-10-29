@@ -5,7 +5,7 @@ use std::fmt::Debug;
 
 pub trait Endpoint: Debug + Sync + Send {
     //fn handle(&self, req: Request) -> Result<Response, Error>;
-    fn handler(&self, req: &Request) -> Result<Response, Error>;
+    fn handler(&self, req: &Request) -> Result<Response<String>, Error>;
 }
 
 #[derive(Debug)]
@@ -18,8 +18,8 @@ impl MyHandler {
 }
 
 impl Endpoint for MyHandler {
-    fn handler(&self, req: &Request) -> Result<Response, Error> {
+    fn handler(&self, req: &Request) -> Result<Response<String>, Error> {
         // Your implementation here
-        Ok(Response::new("run my handler"))
+        Ok(Response::new("run my handler".to_string()))
     }
 }

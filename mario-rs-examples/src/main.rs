@@ -18,8 +18,8 @@ macro_rules! create_handler {
 }
 
 // #[route("/test", method = "GET")]
-async fn example() -> Response {
-    Response::new("run example")
+async fn example() -> Response<String> {
+    Response::new("run example".to_string())
 }
 
 //#[route("/test", method = "GET")]
@@ -44,16 +44,20 @@ impl ExampleHandler {
 }
 
 impl Endpoint for ExampleHandler {
-    fn handler(&self, req: &mario_core::route::request::Request) -> Result<Response, Error> {
+    fn handler(
+        &self,
+        req: &mario_core::route::request::Request,
+    ) -> Result<Response<String>, Error> {
         // Your implementation here
         //Ok(Response::new("run example handler"))
-        async fn example_1() -> String {
+        async fn example_1() -> i32 {
             //Ok(Response::new("run example_1"))
-            "run example_1".to_string()
+            //"run example_1".to_string()
+            return 1;
         }
         let fut = example_1();
         let response = executor::block_on(fut);
-        Ok(Response::new(&response))
+        Ok(Response::new(response.to_string()))
     }
 }
 
@@ -82,13 +86,19 @@ impl Endpoint for ExampleHandler {
 // }
 
 #[handler]
-async fn example_999() -> String {
+async fn example_999() -> i32 {
     //Ok(Response::new("run example_1"))
     // info about the request can be accessed via the `req` parameter
     // info hello world
-    let a = 1;
-    info!("hello world");
-    "run example_99999".to_string()
+    let a = 2;
+    // info!("hello world");
+    // "run example_99999".to_string()
+    return a;
+}
+
+#[handler]
+async fn example_1000() -> String {
+    return "example_1000".to_string();
 }
 
 #[tokio::main]
@@ -96,16 +106,20 @@ pub async fn main() {
     // init trace log
     tracing_subscriber::fmt::init();
     let response = example().await;
-    info!("{:?}", response);
+    //info!("{:?}", response);
     let mut server = MarioServer::new();
     let handler = Arc::new(Box::new(ExampleHandler::new()) as Box<dyn Endpoint>);
     //let handler = create_handler!(ExampleHandler);
     let route = Route::new(http::Method::GET, "/hello_world".to_string(), handler);
 
     let handler_1 = create_handler!(example_999);
-    let route_1 = Route::new(http::Method::GET, "/hello_world_2".to_string(), handler_1);
+    let route_1 = Route::new(http::Method::GET, "/hello_world_1".to_string(), handler_1);
+
+    let handler_2 = create_handler!(example_1000);
+    let route_2 = Route::new(http::Method::GET, "/hello_world_2".to_string(), handler_2);
 
     server.server.bind_route(route);
     server.server.bind_route(route_1);
+    server.server.bind_route(route_2);
     server.start().await;
 }

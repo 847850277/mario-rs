@@ -77,7 +77,7 @@ async fn dispatch(
             //info!("Response: {:?}", response);
             match response {
                 Ok(response) => {
-                    let body = response.body().to_string();
+                    let body = response.get_body().to_string();
                     return Ok(Response::new(Full::new(Bytes::from(body))));
                 }
                 Err(_) => {
