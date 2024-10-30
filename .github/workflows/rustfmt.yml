@@ -23,6 +23,10 @@ jobs:
           rustup component add rustfmt
           cargo fmt -- --check
       - name: Build
-        run: cargo build --verbose
+        run: |
+          rustup component add rustfmt
+          cargo build --verbose
       - name: Test
-        run: cargo test --verbose
+        run: |
+          rustup component add rustfmt
+          cargo test --verbose
