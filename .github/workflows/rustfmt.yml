@@ -11,18 +11,18 @@ env:
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v4
-    - name: Install Rust
-      run: rustup update stable
-    - name: Install rustfmt and clippy
-      run: rustup component add rustfmt clippy
-    - name: Check code format
-      run: cargo fmt -- --check
-    #- name: Run clippy
-    #  run: cargo clippy -- -D warnings
-    - name: Build
-      run: cargo build --verbose
-    - name: Test
-      run: cargo test --verbose
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        run: rustup update stable && rustup default stable
+      - name: Run rustfmt
+        run: |
+          rustup component add rustfmt
+          cargo fmt -- --check
+      - name: Build
+        run: cargo build --verbose
+      - name: Test
+        run: cargo test --verbose
