@@ -1,0 +1,13 @@
+[package]
+name = "other-examples"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+tokio.workspace = true
+tracing-subscriber.workspace = true
+hyper.workspace = true
+http-body-util = { version = "0.1"}
+pin-project-lite = "0.2.14"
+bytes.workspace = true
+log = "0.4.22"

@@ -1,8 +1,7 @@
-use log::info;
 use proc_macro::TokenStream;
+
 use quote::quote;
-use syn::{parse_macro_input, AttributeArgs, ItemFn, Meta, NestedMeta};
-use warp::Filter;
+use syn::ItemFn;
 
 #[proc_macro_attribute]
 pub fn handler(
