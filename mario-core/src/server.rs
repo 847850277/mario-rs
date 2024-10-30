@@ -45,22 +45,20 @@ impl Server {
     pub(crate) async fn start_server(&self) {
         //tokio web server bind port
         let listener = TcpListener::bind("127.0.0.1:8080").await.unwrap();
-        info!("Server running on {}", listener.local_addr().unwrap());
-        let routes = Arc::new(self.get_routes());
-        //TODO init routes
+        info!("Server running on http://{}", listener.local_addr().unwrap());
+        //let routes = Arc::new(self.get_routes());
         loop {
             let (stream, _) = listener.accept().await.unwrap();
             //let routes = self.get_routes();
-            let routes = Arc::clone(&routes);
+            //let routes = Arc::clone(&routes);
             tokio::spawn(async move {
-                handle_connection(routes, stream).await;
+                handle_connection(stream).await;
             });
         }
     }
 }
 
 async fn dispatch(
-    routes: Arc<Vec<Route>>,
     request: Request<hyper::body::Incoming>,
 ) -> Result<Response<Full<Bytes>>, Infallible> {
     let request = MarioRequest::new(request);
@@ -68,7 +66,9 @@ async fn dispatch(
     // let matcher = RouteMatcher::new(vec![
     //     route!(Method::GET, "/hello_world", MyHandler::new()),
     // ]);
-    let matcher = RouteMatcher::new(routes);
+    let routes = vec![
+    ];
+    let matcher = RouteMatcher::new(Arc::new(routes));
     let route = matcher.match_route(&request);
     match route {
         Some(route) => {
@@ -94,14 +94,14 @@ async fn dispatch(
     Ok(Response::new(Full::new(Bytes::from("Hello World!"))))
 }
 
-pub async fn handle_connection(routes: Arc<Vec<Route>>, stream: TcpStream) {
-    let tcp_stream = TokioIo::new(stream);
+pub async fn handle_connection(stream: TcpStream) {
+    let io = TokioIo::new(stream);
     tokio::spawn(async move {
         let builder = Builder::new(TokioExecutor::new());
         builder
             .serve_connection(
-                tcp_stream,
-                service_fn(|req| dispatch(Arc::clone(&routes), req)),
+                io,
+                service_fn(|req| dispatch(req)),
             )
             .await
             .unwrap();
