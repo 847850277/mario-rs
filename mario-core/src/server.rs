@@ -45,7 +45,10 @@ impl Server {
     pub(crate) async fn start_server(&self) {
         //tokio web server bind port
         let listener = TcpListener::bind("127.0.0.1:8080").await.unwrap();
-        info!("Server running on http://{}", listener.local_addr().unwrap());
+        info!(
+            "Server running on http://{}",
+            listener.local_addr().unwrap()
+        );
         //let routes = Arc::new(self.get_routes());
         loop {
             let (stream, _) = listener.accept().await.unwrap();
@@ -66,8 +69,7 @@ async fn dispatch(
     // let matcher = RouteMatcher::new(vec![
     //     route!(Method::GET, "/hello_world", MyHandler::new()),
     // ]);
-    let routes = vec![
-    ];
+    let routes = vec![];
     let matcher = RouteMatcher::new(Arc::new(routes));
     let route = matcher.match_route(&request);
     match route {
@@ -99,10 +101,7 @@ pub async fn handle_connection(stream: TcpStream) {
     tokio::spawn(async move {
         let builder = Builder::new(TokioExecutor::new());
         builder
-            .serve_connection(
-                io,
-                service_fn(|req| dispatch(req)),
-            )
+            .serve_connection(io, service_fn(|req| dispatch(req)))
             .await
             .unwrap();
     });
