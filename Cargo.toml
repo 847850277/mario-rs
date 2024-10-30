@@ -7,7 +7,7 @@ edition = "2021"
 [workspace]
 members = [
     "mario-core", "mario-macro",
-    "mario-rs-examples",
+    "mario-rs-examples", "other-examples",
 ]
 resolver = "2"
 
@@ -15,9 +15,10 @@ resolver = "2"
 mario-core = { path = "mario-core" }
 mario-macro = { path = "mario-macro" }
 tokio = { version = "1.39.3", features = ["full"] }
+tracing-subscriber = "0.3.18"
 anyhow = "1.0"
 http = { version = "1", default-features = false }
-hyper = { version = "1", default-features = false }
+hyper = { version = "1.5.0", features = ["full"] }
 hyper-util = { version = "0.1.8", features = ["full"] }
 tracing = "0.1.27"
 http-body = "1"
@@ -25,4 +26,7 @@ http-body-util = "0.1"
 regex = "1.10.6"
 bytes = "1.7.2"
 log = "0.4.22"
+futures = "0.3.30"
+warp = "0.3"
+
 
