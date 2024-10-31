@@ -8,7 +8,7 @@ use crate::route::handler::{Endpoint, MyHandler};
 pub struct Route {
     pub http_method: Method,
     pub path: String,
-    pub handler: Arc<Box<dyn Endpoint>>,
+    pub handler: Arc<dyn Endpoint>,
 }
 
 impl Clone for Route {
@@ -22,7 +22,7 @@ impl Clone for Route {
 }
 
 impl Route {
-    pub fn new(http_method: Method, path: String, handler: Arc<Box<dyn Endpoint>>) -> Self {
+    pub fn new(http_method: Method, path: String, handler: Arc<dyn Endpoint>) -> Self {
         Self {
             http_method,
             path,
