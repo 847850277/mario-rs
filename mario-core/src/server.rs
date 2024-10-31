@@ -5,6 +5,7 @@ use crate::route::handler::MyHandler;
 use crate::route::request::Request as MarioRequest;
 use crate::route::route::Route;
 use crate::route::route_matcher::RouteMatcher;
+use crate::route::service::Service;
 use bytes::Bytes;
 use http::{Method, Request};
 use http_body_util::Full;
@@ -14,7 +15,6 @@ use hyper_util::rt::{TokioExecutor, TokioIo};
 use hyper_util::server::conn::auto::Builder;
 use tokio::net::{TcpListener, TcpStream};
 use tracing::info;
-use crate::route::service::Service;
 
 pub struct Server {
     pub routes: Vec<Route>,
@@ -57,7 +57,7 @@ impl Server {
             let mut service = Service::new();
             service.set_router(routers);
             tokio::spawn(async move {
-                handle_connection(stream,service).await;
+                handle_connection(stream, service).await;
             });
         }
     }
@@ -94,13 +94,13 @@ async fn dispatch(
     }
 }
 
-pub async fn handle_connection(stream: TcpStream,service: Service) {
+pub async fn handle_connection(stream: TcpStream, service: Service) {
     let io = TokioIo::new(stream);
     tokio::spawn(async move {
         let builder = Builder::new(TokioExecutor::new());
         let service = Arc::new(service);
         builder
-            .serve_connection(io, service_fn(|req| dispatch(req,service.clone())))
+            .serve_connection(io, service_fn(|req| dispatch(req, service.clone())))
             .await
             .unwrap();
     });
