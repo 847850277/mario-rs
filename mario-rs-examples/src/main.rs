@@ -13,7 +13,7 @@ use mario_macro::handler;
 
 macro_rules! create_handler {
     ($handler_type:ty) => {
-        Arc::new(Box::new(<$handler_type>::new()) as Box<dyn Endpoint>)
+        Arc::new(<$handler_type>::new())
     };
 }
 
@@ -106,9 +106,8 @@ pub async fn main() {
     // init trace log
     tracing_subscriber::fmt::init();
     let response = example().await;
-    //info!("{:?}", response);
     let mut server = MarioServer::new();
-    let handler = Arc::new(Box::new(ExampleHandler::new()) as Box<dyn Endpoint>);
+    let handler = Arc::new(ExampleHandler::new());
     //let handler = create_handler!(ExampleHandler);
     let route = Route::new(http::Method::GET, "/hello_world".to_string(), handler);
 
