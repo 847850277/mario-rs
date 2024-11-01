@@ -1,4 +1,5 @@
 use std::future::Future;
+use std::pin::Pin;
 use futures::executor;
 use http::{Method, Request};
 use log::info;
@@ -48,7 +49,7 @@ impl Endpoint for ExampleHandler {
     fn call(
         &self,
         req: &mario_core::route::request::Request,
-    ) -> impl Future<Output=Result<Response<String>, Error>> + Send {
+    ) -> Pin<Box<dyn Future<Output = Result<Response<String>, Error>> + Send>>{
         // Your implementation here
         //Ok(Response::new("run example handler"))
         // async fn example_1() -> i32 {
@@ -56,10 +57,10 @@ impl Endpoint for ExampleHandler {
         //     //"run example_1".to_string()
         //     return 1;
         // }
-        async move {
+        Box::pin(async move {
             let response = example_1().await;
             Ok(Response::new(response.to_string()))
-        }
+        })
     }
 }
 

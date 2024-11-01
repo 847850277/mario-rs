@@ -74,7 +74,7 @@ async fn dispatch(
     match route {
         Some(route) => {
             info!("Route found: {:?}", route);
-            let response = route.handler.call(&request);
+            let response = route.handler.call(&request).await;
             //info!("Response: {:?}", response);
             match response {
                 Ok(response) => {
