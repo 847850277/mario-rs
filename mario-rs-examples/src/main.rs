@@ -1,14 +1,12 @@
-use futures::executor;
-use http::{Method, Request};
-use log::info;
+use std::future::Future;
+use std::pin::Pin;
+use std::sync::Arc;
+
 use mario_core::mario_server::MarioServer;
 use mario_core::route::error::Error;
-use mario_core::route::handler::{Endpoint, MyHandler};
+use mario_core::route::handler::Endpoint;
 use mario_core::route::response::Response;
 use mario_core::route::route::Route;
-use std::sync::Arc;
-use warp::Filter;
-
 use mario_macro::handler;
 
 macro_rules! create_handler {
@@ -44,20 +42,21 @@ impl ExampleHandler {
 }
 
 impl Endpoint for ExampleHandler {
-    fn handler(
+    fn call(
         &self,
         req: &mario_core::route::request::Request,
-    ) -> Result<Response<String>, Error> {
+    ) -> Pin<Box<dyn Future<Output = Result<Response<String>, Error>> + Send>> {
         // Your implementation here
         //Ok(Response::new("run example handler"))
-        async fn example_1() -> i32 {
-            //Ok(Response::new("run example_1"))
-            //"run example_1".to_string()
-            return 1;
-        }
-        let fut = example_1();
-        let response = executor::block_on(fut);
-        Ok(Response::new(response.to_string()))
+        // async fn example_1() -> i32 {
+        //     //Ok(Response::new("run example_1"))
+        //     //"run example_1".to_string()
+        //     return 1;
+        // }
+        Box::pin(async move {
+            let response = example_1().await;
+            Ok(Response::new(response.to_string()))
+        })
     }
 }
 

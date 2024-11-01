@@ -30,7 +30,7 @@ fn generate_handler(_args: TokenStream, input: TokenStream) -> syn::Result<Token
         }
 
         impl Endpoint for #ident {
-            fn handler(&self, req: &mario_core::route::request::Request) -> Result<Response<String>, Error> {
+            fn call(&self, req: &mario_core::route::request::Request) -> Pin<Box<dyn Future<Output = Result<Response<String>, Error>> + Send>>{
                 // Your implementation here
                 //Ok(Response::new("run example handler"))
                 // async fn example_2() -> String {
@@ -39,8 +39,13 @@ fn generate_handler(_args: TokenStream, input: TokenStream) -> syn::Result<Token
                 // }
                 #item_fn
                 let fut = #ident();
-                let response = executor::block_on(fut);
-                Ok(Response::new(response.to_string()))
+                Box::pin(async move {
+                    let response = fut.await;
+                    Ok(Response::new(response.to_string()))
+                    // let response = example_1().await;
+                    // Ok(Response::new(response.to_string()))
+                })
+
             }
         }
     };
