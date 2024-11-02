@@ -7,13 +7,14 @@ edition = "2021"
 [workspace]
 members = [
     "mario-core", "mario-macro",
-    "mario-rs-examples", "other-examples",
+    "mario-rs-examples", "sync-core", "other-examples", "sync-examples",
 ]
 resolver = "2"
 
 [workspace.dependencies]
 mario-core = { path = "mario-core" }
 mario-macro = { path = "mario-macro" }
+sync-core = { path = "sync-core" }
 tokio = { version = "1.39.3", features = ["full"] }
 tracing-subscriber = "0.3.18"
 anyhow = "1.0"

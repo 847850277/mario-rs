@@ -1,0 +1,7 @@
+[package]
+name = "sync-examples"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+sync-core = { workspace = true }
