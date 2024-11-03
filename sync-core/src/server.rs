@@ -49,10 +49,13 @@ impl Server {
             .find(|r| r.method == method && r.path == path);
         match route {
             Some(route) => {
-                (route.handler)();
+                let response_body = (route.handler)();
+                let response = format!("HTTP/1.1 200 OK\r\n\r\n{}", response_body);
+                tcp_stream.write(response.as_bytes()).unwrap();
             }
             None => {
-                let response = "HTTP/1.1 404 NOT FOUND\r\n\r\n";
+                let response_body = "Not Found Route";
+                let response = format!("HTTP/1.1 200 OK\r\n\r\n{}", response_body);
                 tcp_stream.write(response.as_bytes()).unwrap();
             }
         }
