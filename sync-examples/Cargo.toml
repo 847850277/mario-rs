@@ -5,3 +5,4 @@ edition.workspace = true
 
 [dependencies]
 sync-core = { workspace = true }
+tracing-subscriber = "0.3.18"
