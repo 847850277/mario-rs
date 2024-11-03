@@ -1,18 +1,19 @@
+use crate::service::Service;
 use log::info;
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 
-pub struct Server {}
+pub struct Server {
+    pub service: Service,
+}
 
 impl Server {
-    pub fn new() -> Self {
-        Self {}
+    pub fn new(service: Service) -> Self {
+        Self { service }
     }
 
     pub fn start(&self) {
-        //println!("todo start tcp server...");
         let addr = "127.0.0.1:8080";
-        // start tcp server
         let listener = TcpListener::bind(addr).unwrap();
         info!("Listening on http://{}", addr);
         for stream in listener.incoming() {
@@ -28,14 +29,32 @@ impl Server {
     }
 
     fn handle_connection(&self, mut tcp_stream: TcpStream) {
-        //println!("todo handle connection...");
         let mut buffer = [0; 1024];
         tcp_stream.read(&mut buffer).unwrap();
-        println!("Request: {}", String::from_utf8_lossy(&buffer));
-
-        // response
-        let response = "HTTP/1.1 200 OK\r\n\r\n";
-        let response = format!("{}{}", response, "Hello World");
-        tcp_stream.write(response.as_bytes()).unwrap();
+        info!("Request: {}", String::from_utf8_lossy(&buffer));
+        // parse request
+        let request = String::from_utf8_lossy(&buffer);
+        let request = request.split_whitespace().collect::<Vec<&str>>();
+        let method = request[0];
+        let path = request[1];
+        let _version = request[2];
+        info!("Method: {}", method);
+        info!("Path: {}", path);
+        info!("Version: {}", _version);
+        // find route
+        let route = self
+            .service
+            .routes
+            .iter()
+            .find(|r| r.method == method && r.path == path);
+        match route {
+            Some(route) => {
+                (route.handler)();
+            }
+            None => {
+                let response = "HTTP/1.1 404 NOT FOUND\r\n\r\n";
+                tcp_stream.write(response.as_bytes()).unwrap();
+            }
+        }
     }
 }
