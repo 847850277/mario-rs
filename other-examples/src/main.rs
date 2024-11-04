@@ -1,11 +1,11 @@
 mod support;
 
 use crate::support::TokioIo;
-use bytes::{Buf, Bytes};
+use bytes::Bytes;
 use http_body_util::{BodyExt, Full};
 use hyper::server::conn::http1;
 use hyper::service::service_fn;
-use hyper::{body::Incoming as IncomingBody, header, Method, Request, Response, StatusCode};
+use hyper::{body::Incoming as IncomingBody, Method, Request, Response, StatusCode};
 use log::info;
 use tokio::net::TcpListener;
 
@@ -26,7 +26,7 @@ async fn main() -> Result<()> {
         let (stream, _) = listener.accept().await?;
         let io = TokioIo::new(stream);
         tokio::task::spawn(async move {
-            let service = service_fn(move |req| response_examples(req));
+            let service = service_fn(response_examples);
             if let Err(err) = http1::Builder::new().serve_connection(io, service).await {
                 println!("Failed to serve connection: {:?}", err);
             }

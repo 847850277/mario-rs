@@ -1,3 +1,4 @@
+#[allow(non_snake_case)]
 use log::info;
 use std::future::Future;
 use std::pin::Pin;
@@ -23,19 +24,13 @@ async fn example_1() -> String {
     "run example_1".to_string()
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct ExampleHandler;
-
-impl ExampleHandler {
-    pub fn new() -> Self {
-        Self
-    }
-}
 
 impl Endpoint for ExampleHandler {
     fn call(
         &self,
-        req: &mario_core::request::Request,
+        _req: &mario_core::request::Request,
     ) -> Pin<Box<dyn Future<Output = Result<Response<String>, Error>> + Send>> {
         Box::pin(async move {
             let response = example_1().await;
@@ -45,14 +40,15 @@ impl Endpoint for ExampleHandler {
 }
 
 #[handler]
-async fn example_999() -> i32 {
+async fn Hello() -> i32 {
     2
 }
 
 #[handler]
-async fn example_1000() -> String {
-    return "example_1000".to_string();
+async fn World() -> String {
+    "example_3".to_string()
 }
+
 
 #[tokio::main]
 pub async fn main() {
@@ -61,15 +57,15 @@ pub async fn main() {
     let response = example().await;
     info!("Response: {:?}", response);
     let mut server = Server::new();
-    let handler = Arc::new(ExampleHandler::new());
+    let handler = Arc::new(ExampleHandler);
     //let handler = create_handler!(ExampleHandler);
     let route = Route::new(http::Method::GET, "/hello_world".to_string(), handler);
 
-    let handler_1 = create_handler!(example_999);
-    let route_1 = Route::new(http::Method::GET, "/hello_world_1".to_string(), handler_1);
+    let handler_1 = create_handler!(Hello);
+    let route_1 = Route::new(http::Method::GET, "/hello_world_2".to_string(), handler_1);
 
-    let handler_2 = create_handler!(example_1000);
-    let route_2 = Route::new(http::Method::GET, "/hello_world_2".to_string(), handler_2);
+    let handler_2 = create_handler!(World);
+    let route_2 = Route::new(http::Method::GET, "/hello_world_3".to_string(), handler_2);
 
     server.bind_route(route);
     server.bind_route(route_1);

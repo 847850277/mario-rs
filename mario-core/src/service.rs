@@ -1,5 +1,6 @@
 use crate::route::Route;
 
+#[derive(Default, Clone)]
 pub struct Service {
     pub router: Vec<Route>,
 }
@@ -18,14 +19,5 @@ impl Service {
     // set router
     pub fn set_router(&mut self, router: Vec<Route>) {
         self.router = router;
-    }
-}
-
-// clone
-impl Clone for Service {
-    fn clone(&self) -> Self {
-        Service {
-            router: self.router.clone(),
-        }
     }
 }

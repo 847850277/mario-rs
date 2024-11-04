@@ -2,7 +2,7 @@ use std::convert::Infallible;
 use std::sync::Arc;
 
 use bytes::Bytes;
-use http::{Method, Request};
+use http::Request;
 use http_body_util::Full;
 use hyper::service::service_fn;
 use hyper::Response;
@@ -16,18 +16,10 @@ use crate::route::Route;
 use crate::route_matcher::RouteMatcher;
 use crate::service::Service;
 
+#[derive(Default)]
+#[allow(non_camel_case_types)]
 pub struct Server {
     pub routes: Vec<Route>,
-}
-
-macro_rules! route {
-    ($method:expr, $path:expr, $handler:expr) => {
-        Route {
-            http_method: $method,
-            path: String::from($path),
-            handler: Box::new($handler),
-        }
-    };
 }
 
 impl Server {
@@ -79,18 +71,14 @@ async fn dispatch(
             match response {
                 Ok(response) => {
                     let body = response.get_body().to_string();
-                    return Ok(Response::new(Full::new(Bytes::from(body))));
+                    Ok(Response::new(Full::new(Bytes::from(body))))
                 }
-                Err(_) => {
-                    return Ok(Response::new(Full::new(Bytes::from(
-                        "500 Internal Server Error",
-                    ))));
-                }
+                Err(_) => Ok(Response::new(Full::new(Bytes::from(
+                    "500 Internal Server Error",
+                )))),
             }
         }
-        None => {
-            return Ok(Response::new(Full::new(Bytes::from("404 Not Found"))));
-        }
+        None => Ok(Response::new(Full::new(Bytes::from("404 Not Found")))),
     }
 }
 

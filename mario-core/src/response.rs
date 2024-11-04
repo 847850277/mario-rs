@@ -3,12 +3,6 @@ pub struct Response<T> {
     body: T,
 }
 
-impl<T: std::fmt::Debug> Response<T> {
-    fn as_text(&self) -> String {
-        return format!("{:?}", self.body);
-    }
-}
-
 impl<T> Response<T> {
     pub fn new(body: T) -> Response<T> {
         Response { body }
@@ -18,6 +12,6 @@ impl<T> Response<T> {
     }
 
     pub fn get_body(&self) -> &T {
-        return &self.body;
+        &self.body
     }
 }

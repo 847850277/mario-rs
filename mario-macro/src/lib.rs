@@ -8,10 +8,7 @@ pub fn handler(
     args: proc_macro::TokenStream,
     input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
-    match generate_handler(args.into(), input.into()) {
-        Ok(stream) => stream.into(),
-        Err(err) => err.into_compile_error().into(),
-    }
+    generate_handler(args, input).unwrap_or_else(|err| err.into_compile_error().into())
 }
 
 fn generate_handler(_args: TokenStream, input: TokenStream) -> syn::Result<TokenStream> {
