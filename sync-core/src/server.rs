@@ -30,7 +30,7 @@ impl Server {
 
     fn handle_connection(&self, mut tcp_stream: TcpStream) {
         let mut buffer = [0; 1024];
-        tcp_stream.read_exact(&mut buffer).unwrap();
+        tcp_stream.read(&mut buffer).unwrap();
         info!("Request: {}", String::from_utf8_lossy(&buffer));
         // parse request
         let request = String::from_utf8_lossy(&buffer);
@@ -50,7 +50,7 @@ impl Server {
         match route {
             Some(route) => {
                 let response_body = (route.handler)();
-                let response = format!("HTTP/1.1 200 OK\r\n\r\n{}", response_body);
+                let response = format!("HTTP/1.1 200 OK\r\n\r\n{:?}", response_body);
                 tcp_stream.write_all(response.as_bytes()).unwrap();
             }
             None => {
