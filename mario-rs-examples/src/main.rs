@@ -1,22 +1,14 @@
-#[allow(non_snake_case)]
-use log::info;
 use std::future::Future;
 use std::pin::Pin;
 use std::sync::Arc;
+
+use log::info;
 
 use mario_core::error::Error;
 use mario_core::handler::Endpoint;
 use mario_core::response::Response;
 use mario_core::route::Route;
 use mario_core::server::Server;
-use mario_macro::handler;
-
-macro_rules! create_handler {
-    ($handler_type:ty) => {
-        Arc::new(<$handler_type>::new())
-    };
-}
-
 async fn example() -> Response<String> {
     Response::new("run example".to_string())
 }
@@ -39,16 +31,15 @@ impl Endpoint for ExampleHandler {
     }
 }
 
-#[handler]
-async fn Hello() -> i32 {
-    2
-}
-
-#[handler]
-async fn World() -> String {
-    "example_3".to_string()
-}
-
+// #[handler]
+// async fn hello() -> i32 {
+//     2
+// }
+//
+// #[handler]
+// async fn world() -> String {
+//     "example_3".to_string()
+// }
 
 #[tokio::main]
 pub async fn main() {
@@ -61,15 +52,15 @@ pub async fn main() {
     //let handler = create_handler!(ExampleHandler);
     let route = Route::new(http::Method::GET, "/hello_world".to_string(), handler);
 
-    let handler_1 = create_handler!(Hello);
-    let route_1 = Route::new(http::Method::GET, "/hello_world_2".to_string(), handler_1);
-
-    let handler_2 = create_handler!(World);
-    let route_2 = Route::new(http::Method::GET, "/hello_world_3".to_string(), handler_2);
+    // let handler_1 = Arc::new(hello);
+    // let route_1 = Route::new(http::Method::GET, "/hello_world_2".to_string(), handler_1);
+    //
+    // let handler_2 = Arc::new(world);
+    // let route_2 = Route::new(http::Method::GET, "/hello_world_3".to_string(), handler_2);
 
     server.bind_route(route);
-    server.bind_route(route_1);
-    server.bind_route(route_2);
+    // server.bind_route(route_1);
+    // server.bind_route(route_2);
 
     server.start_server().await;
 }

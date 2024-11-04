@@ -17,7 +17,6 @@ use crate::route_matcher::RouteMatcher;
 use crate::service::Service;
 
 #[derive(Default)]
-#[allow(non_camel_case_types)]
 pub struct Server {
     pub routes: Vec<Route>,
 }
