@@ -1,5 +1,6 @@
 use crate::route::Route;
 
+#[derive(Default)]
 pub struct Service {
     pub routes: Vec<Route>,
 }

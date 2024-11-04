@@ -1,9 +1,11 @@
 use crate::route::Route;
 use std::sync::Arc;
 
+#[derive(Default)]
 pub struct Routers {
     routes: Vec<Arc<Route>>,
 }
+
 impl Routers {
     pub fn new() -> Self {
         Self { routes: Vec::new() }

@@ -35,7 +35,7 @@ impl Request {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Head {
     /// The request's method
     pub method: Method,
@@ -51,16 +51,4 @@ pub struct Head {
 
     /// The request's extensions
     pub extensions: Extensions,
-}
-
-impl Clone for Head {
-    fn clone(&self) -> Self {
-        Self {
-            method: self.method.clone(),
-            uri: self.uri.clone(),
-            version: self.version.clone(),
-            headers: self.headers.clone(),
-            extensions: self.extensions.clone(),
-        }
-    }
 }

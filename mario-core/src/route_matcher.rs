@@ -16,11 +16,8 @@ impl RouteMatcher {
     }
 
     pub(crate) fn match_route(&self, req: &Request) -> Option<&Route> {
-        for route in self.routes.as_ref() {
-            if route.http_method == req.head.method && route.path == req.head.uri.path() {
-                return Some(route);
-            }
-        }
-        None
+        self.routes.as_ref().iter().find(|&route| {
+            route.http_method == req.head.method && route.path == req.head.uri.path()
+        })
     }
 }
