@@ -1,4 +1,4 @@
-//#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Response<T> {
     body: T,
 }

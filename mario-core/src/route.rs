@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use http::Method;
 
-use crate::route::handler::{Endpoint, MyHandler};
+use crate::handler::Endpoint;
 
 pub struct Route {
     pub http_method: Method,

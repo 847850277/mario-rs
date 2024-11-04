@@ -1,4 +1,4 @@
-use crate::route::route::Route;
+use crate::route::Route;
 
 pub struct Service {
     pub router: Vec<Route>,
