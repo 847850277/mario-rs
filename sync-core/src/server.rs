@@ -49,8 +49,11 @@ impl Server {
             .find(|r| r.method == method && r.path == path);
         match route {
             Some(route) => {
-                let response_body = (route.handler)();
-                let response = format!("HTTP/1.1 200 OK\r\n\r\n{:?}", response_body);
+                //let response_body = (route.handler)();
+                let response_body = route.handler.call();
+                // info response
+                info!("Response: {}", response_body);
+                let response = format!("HTTP/1.1 200 OK\r\n\r\n");
                 tcp_stream.write_all(response.as_bytes()).unwrap();
             }
             None => {
