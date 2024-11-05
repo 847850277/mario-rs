@@ -20,6 +20,7 @@ impl handler for Test1 {
         let string = test_1();
         //return response
         println!("{}", string);
+        //TODO into Response
         Response{}
     }
 }
@@ -32,6 +33,7 @@ impl handler for Test2 {
         let int = test_2();
         //return response
         println!("{}", int);
+        //TODO into Response
         Response{}
     }
 }
