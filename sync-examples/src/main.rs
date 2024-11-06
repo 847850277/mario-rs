@@ -10,8 +10,6 @@ fn test_1() -> String{
 fn test_2() -> i32{
     2
 }
-
-
 struct Test1;
 
 impl handler for Test1 {
@@ -20,8 +18,9 @@ impl handler for Test1 {
         let string = test_1();
         //return response
         println!("{}", string);
+        //return response
         //TODO into Response
-        Response{}
+        string.into_response()
     }
 }
 
@@ -34,7 +33,7 @@ impl handler for Test2 {
         //return response
         println!("{}", int);
         //TODO into Response
-        Response{}
+        int.into_response()
     }
 }
 
