@@ -1,5 +1,5 @@
 use std::sync::Arc;
-use sync_core::route::{handler, Response};
+use sync_core::route::{handler, IntoResponse, Response};
 use sync_core::server::Server;
 use sync_core::service::Service;
 
@@ -14,12 +14,8 @@ struct Test1;
 
 impl handler for Test1 {
     fn call(&self) -> Response {
-        //call test_1
         let string = test_1();
-        //return response
         println!("{}", string);
-        //return response
-        //TODO into Response
         string.into_response()
     }
 }
@@ -28,11 +24,8 @@ struct Test2;
 
 impl handler for Test2 {
     fn call(&self) -> Response {
-        //call test_2
         let int = test_2();
-        //return response
         println!("{}", int);
-        //TODO into Response
         int.into_response()
     }
 }
@@ -46,7 +39,6 @@ fn main() {
 
     let route = sync_core::route::Route::new("GET".to_string(), "/hello".to_string(), Arc::new(Test1)
     );
-    // hello world 2 return int value
     let route2 = sync_core::route::Route::new("GET".to_string(), "/hello2".to_string(), Arc::new(Test2)
     );
 

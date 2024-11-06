@@ -1,9 +1,11 @@
 //use http::Response;
 
-use std::sync::Arc;
-use http_body_util::combinators::UnsyncBoxBody;
 use std::error::Error as StdError;
+use std::sync::Arc;
+
 use bytes::Bytes;
+use http_body_util::BodyExt;
+use http_body_util::combinators::UnsyncBoxBody;
 
 pub type Response<T = ResponseBody> = http::Response<T>;
 
@@ -24,19 +26,17 @@ pub trait IntoResponse{
 
 impl IntoResponse for String {
     fn into_response(self) -> Response {
-        Response::builder()
-            .header("Content-Type", "text/plain; charset=utf-8")
-            .body(self.into())
-            .unwrap()
+        //let body = UnsyncBoxBody::new(crate::Empty::new().map_err(|err| match err {}));
+        let body = UnsyncBoxBody::new(
+            http_body_util::Full::new(self.into()).map_err(|_| unreachable!()),
+        );
+        Response::new(ResponseBody(body))
     }
 }
 
 impl IntoResponse for i32 {
     fn into_response(self) -> Response {
-        Response::builder()
-            .header("Content-Type", "text/plain; charset=utf-8")
-            .body(self.into())
-            .unwrap()
+        Response::new(ResponseBody(Default::default()))
     }
 }
 

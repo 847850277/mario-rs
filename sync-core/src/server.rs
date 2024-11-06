@@ -50,10 +50,15 @@ impl Server {
         match route {
             Some(route) => {
                 //let response_body = (route.handler)();
-                let response_body = route.handler.call();
+                let handler_response = route.handler.call();
+                //info
+                info!("{:?}", handler_response);
+                let response_body = handler_response.body();
+                //info
                 // info response
-                info!("Response: {}", response_body);
-                let response = format!("HTTP/1.1 200 OK\r\n\r\n");
+                // write response
+                // //let response = format!("HTTP/1.1 200 OK\r\n\r\n");
+                let response = format!("HTTP/1.1 200 OK\r\n\r\n{:?}", response_body);
                 tcp_stream.write_all(response.as_bytes()).unwrap();
             }
             None => {
