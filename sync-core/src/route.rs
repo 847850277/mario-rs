@@ -32,6 +32,17 @@ impl Response{
         }
     }
 
+    pub fn new_empty() -> Response {
+        Response {
+            body: Default::default(),
+        }
+    }
+
+    // set body
+    pub fn set_body(&mut self, body: Body) {
+        self.body = body;
+    }
+
 
 }
 
@@ -61,17 +72,23 @@ impl IntoResponse for Body {
 
 impl IntoResponse for String {
     fn into_response(self) -> Response {
-        Response::builder()
-            .body(self)
+        // Response::builder()
+        //     .body(Body::from(self))
         //Response::new(1)
+        let mut response = Response::new_empty();
+        println!("{}", self);
+        // sef to body
+        let body = Body::new(self);
+        response.set_body(body);
+        return response;
     }
 }
 
 impl IntoResponse for i32 {
     fn into_response(self) -> Response {
-        //Response::new(ResponseBody(Default::default()))
-        Response::builder()
-            .body(self.to_string())
+        let mut response = Response::new_empty();
+        println!("{}", self);
+        return response;
     }
 }
 
