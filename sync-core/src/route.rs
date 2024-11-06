@@ -1,18 +1,47 @@
-//use http::Response;
 
-use std::error::Error as StdError;
+use std::io::Error as IoError;
 use std::sync::Arc;
 
 use bytes::Bytes;
-use http_body_util::BodyExt;
-use http_body_util::combinators::UnsyncBoxBody;
 
-pub type Response<T = ResponseBody> = http::Response<T>;
+pub(crate) type BoxBody = http_body_util::combinators::BoxBody<Bytes, IoError>;
 
-pub type BoxError = Box<dyn StdError + Send + Sync>;
+/// A body object for requests and responses.
+#[derive(Default, Debug)]
+pub struct Body(pub(crate) BoxBody);
+
 
 #[derive(Debug)]
-pub struct ResponseBody(UnsyncBoxBody<Bytes, BoxError>);
+pub struct Response {
+    body: Body,
+}
+
+pub struct ResponseBuilder {
+}
+
+impl Response{
+    pub fn builder() -> ResponseBuilder {
+        ResponseBuilder {
+        }
+    }
+
+    //new
+    pub fn new(body: Body) -> Response {
+        Response {
+            body,
+        }
+    }
+
+
+}
+
+impl ResponseBuilder {
+    pub fn body(self, body: impl Into<Body>) -> Response {
+        Response {
+            body: body.into(),
+        }
+    }
+}
 
 pub trait handler {
     fn call(&self) -> Response;
@@ -24,19 +53,25 @@ pub trait IntoResponse{
 
 //impl String for IntoResponse
 
+impl IntoResponse for Body {
+    fn into_response(self) -> Response {
+        Response::builder().body(self)
+    }
+}
+
 impl IntoResponse for String {
     fn into_response(self) -> Response {
-        //let body = UnsyncBoxBody::new(crate::Empty::new().map_err(|err| match err {}));
-        let body = UnsyncBoxBody::new(
-            http_body_util::Full::new(self.into()).map_err(|_| unreachable!()),
-        );
-        Response::new(ResponseBody(body))
+        Response::builder()
+            .body(self)
+        //Response::new(1)
     }
 }
 
 impl IntoResponse for i32 {
     fn into_response(self) -> Response {
-        Response::new(ResponseBody(Default::default()))
+        //Response::new(ResponseBody(Default::default()))
+        Response::builder()
+            .body(self.to_string())
     }
 }
 
