@@ -3,6 +3,7 @@ use log::info;
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 
+#[deny(clippy::unused_io_amount)]
 pub struct Server {
     pub service: Service,
 }
@@ -49,11 +50,9 @@ impl Server {
             .find(|r| r.method == method && r.path == path);
         match route {
             Some(route) => {
-                //let response_body = (route.handler)();
                 let handler_response = route.handler.call();
                 //info
                 info!("Response: {:?}", handler_response);
-                // //let response = format!("HTTP/1.1 200 OK\r\n\r\n");
                 let response = format!("HTTP/1.1 200 OK\r\n\r\n{:?}", handler_response);
                 tcp_stream.write_all(response.as_bytes()).unwrap();
             }

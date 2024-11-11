@@ -1,106 +1,46 @@
-
-use std::io::Error as IoError;
 use std::sync::Arc;
 
 use bytes::Bytes;
+use http::Response;
+use http_body_util::BodyExt;
 
-pub(crate) type BoxBody = http_body_util::combinators::BoxBody<Bytes, IoError>;
+pub type BoxBody = http_body_util::combinators::BoxBody<Bytes, hyper::Error>;
 
-/// A body object for requests and responses.
-#[derive(Default, Debug)]
-pub struct Body(pub(crate) BoxBody);
-
-
-#[derive(Debug)]
-pub struct Response {
-    body: Body,
+fn full<T: Into<Bytes>>(chunk: T) -> BoxBody {
+    http_body_util::Full::new(chunk.into())
+        .map_err(|never| match never {})
+        .boxed()
 }
 
-pub struct ResponseBuilder {
+#[allow(non_camel_case_types)]
+pub trait Handler {
+    fn call(&self) -> Response<BoxBody>;
 }
 
-impl Response{
-    pub fn builder() -> ResponseBuilder {
-        ResponseBuilder {
-        }
-    }
-
-    //new
-    pub fn new(body: Body) -> Response {
-        Response {
-            body,
-        }
-    }
-
-    pub fn new_empty() -> Response {
-        Response {
-            body: Default::default(),
-        }
-    }
-
-    // set body
-    pub fn set_body(&mut self, body: Body) {
-        self.body = body;
-    }
-
-
-}
-
-impl ResponseBuilder {
-    pub fn body(self, body: impl Into<Body>) -> Response {
-        Response {
-            body: body.into(),
-        }
-    }
-}
-
-pub trait handler {
-    fn call(&self) -> Response;
-}
-
-pub trait IntoResponse{
-    fn into_response(self) -> Response;
-}
-
-//impl String for IntoResponse
-
-impl IntoResponse for Body {
-    fn into_response(self) -> Response {
-        Response::builder().body(self)
-    }
+pub trait IntoResponse {
+    fn into_response(self) -> Response<BoxBody>;
 }
 
 impl IntoResponse for String {
-    fn into_response(self) -> Response {
-        // Response::builder()
-        //     .body(Body::from(self))
-        //Response::new(1)
-        let mut response = Response::new_empty();
-        println!("{}", self);
-        // sef to body
-        let body = Body::new(self);
-        response.set_body(body);
-        return response;
+    fn into_response(self) -> Response<BoxBody> {
+        Response::new(full(self))
     }
 }
 
 impl IntoResponse for i32 {
-    fn into_response(self) -> Response {
-        let mut response = Response::new_empty();
-        println!("{}", self);
-        return response;
+    fn into_response(self) -> Response<BoxBody> {
+        Response::new(full(self.to_string()))
     }
 }
-
 
 pub struct Route {
     pub method: String,
     pub path: String,
-    pub handler: Arc<dyn handler>,
+    pub handler: Arc<dyn Handler>,
 }
 
 impl Route {
-    pub fn new(method: String, path: String, handler: Arc<dyn handler>) -> Self {
+    pub fn new(method: String, path: String, handler: Arc<dyn Handler>) -> Self {
         Self {
             method,
             path,
