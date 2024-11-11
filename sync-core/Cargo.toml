@@ -5,4 +5,7 @@ edition.workspace = true
 
 [dependencies]
 log = "0.4.22"
-
+http.workspace = true
+http-body-util.workspace = true
+bytes.workspace = true
+hyper.workspace = true
