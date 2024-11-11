@@ -9,6 +9,8 @@ use mario_core::handler::Endpoint;
 use mario_core::response::Response;
 use mario_core::route::Route;
 use mario_core::server::Server;
+use mario_macro::handler;
+
 async fn example() -> Response<String> {
     Response::new("run example".to_string())
 }
@@ -31,15 +33,15 @@ impl Endpoint for ExampleHandler {
     }
 }
 
-// #[handler]
-// async fn hello() -> i32 {
-//     2
-// }
-//
-// #[handler]
-// async fn world() -> String {
-//     "example_3".to_string()
-// }
+#[handler]
+async fn hello() -> i32 {
+    2
+}
+
+#[handler]
+async fn world() -> String {
+    "example_3".to_string()
+}
 
 #[tokio::main]
 pub async fn main() {
@@ -52,11 +54,11 @@ pub async fn main() {
     //let handler = create_handler!(ExampleHandler);
     let route = Route::new(http::Method::GET, "/hello_world".to_string(), handler);
 
-    // let handler_1 = Arc::new(hello);
-    // let route_1 = Route::new(http::Method::GET, "/hello_world_2".to_string(), handler_1);
-    //
-    // let handler_2 = Arc::new(world);
-    // let route_2 = Route::new(http::Method::GET, "/hello_world_3".to_string(), handler_2);
+    let handler_1 = Arc::new(hello);
+    let route_1 = Route::new(http::Method::GET, "/hello_world_2".to_string(), handler_1);
+
+    let handler_2 = Arc::new(world);
+    let route_2 = Route::new(http::Method::GET, "/hello_world_3".to_string(), handler_2);
 
     server.bind_route(route);
     // server.bind_route(route_1);
