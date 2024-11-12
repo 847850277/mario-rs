@@ -6,6 +6,7 @@ use hyper::{
 };
 use route_recognizer::Params;
 use router::Router;
+use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
 mod handler;
@@ -22,7 +23,6 @@ pub struct AppState {
 #[tokio::main]
 async fn main() {
     let some_state = "state".to_string();
-
     let mut router: Router = Router::new();
     router.get("/test", Box::new(handler::test_handler));
     router.post("/send", Box::new(handler::send_handler));

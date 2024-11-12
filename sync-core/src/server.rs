@@ -42,25 +42,20 @@ impl Server {
         info!("Method: {}", method);
         info!("Path: {}", path);
         info!("Version: {}", _version);
-        // find route
-        let route = self
-            .service
-            .routes
-            .iter()
-            .find(|r| r.method == method && r.path == path);
-        match route {
-            Some(route) => {
-                let handler_response = route.handler.call();
-                //info
-                info!("Response: {:?}", handler_response);
-                let response = format!("HTTP/1.1 200 OK\r\n\r\n{:?}", handler_response);
-                tcp_stream.write_all(response.as_bytes()).unwrap();
-            }
-            None => {
-                let response_body = "Not Found Route";
-                let response = format!("HTTP/1.1 200 OK\r\n\r\n{}", response_body);
-                tcp_stream.write_all(response.as_bytes()).unwrap();
-            }
-        }
+        let router = self.service.get_routes();
+        // method str to Http Method
+        let method = match method {
+            "GET" => http::Method::GET,
+            "POST" => http::Method::POST,
+            "PUT" => http::Method::PUT,
+            "DELETE" => http::Method::DELETE,
+            _ => http::Method::GET,
+        };
+        let handler = router.route(path, &method);
+        let handler_response = handler.handler.call();
+        //info
+        info!("Response: {:?}", handler_response);
+        let response = format!("HTTP/1.1 200 OK\r\n\r\n{:?}", handler_response);
+        tcp_stream.write_all(response.as_bytes()).unwrap();
     }
 }

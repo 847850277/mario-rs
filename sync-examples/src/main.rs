@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use http::Response;
-use sync_core::route::{BoxBody, Handler, IntoResponse};
+use sync_core::route::{BoxBody, Handler, IntoResponse, Router};
 use sync_core::server::Server;
 use sync_core::service::Service;
 
@@ -37,15 +37,10 @@ fn main() {
     //trace log
     tracing_subscriber::fmt::init();
     let mut server = Server::new(Service::new());
-
-    let route =
-        sync_core::route::Route::new("GET".to_string(), "/hello".to_string(), Arc::new(Test1));
-    let route2 =
-        sync_core::route::Route::new("GET".to_string(), "/hello2".to_string(), Arc::new(Test2));
-
+    let mut router: Router = Router::new();
+    router.get("/hello", Arc::new(Test1));
+    router.get("/hello2", Arc::new(Test2));
     // push route to server
-    server.service.routes.push(route);
-    server.service.routes.push(route2);
-
+    server.service.set_routes(router);
     server.start();
 }
