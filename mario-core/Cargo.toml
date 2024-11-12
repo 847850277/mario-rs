@@ -14,4 +14,5 @@ http-body-util.workspace = true
 regex.workspace = true
 bytes.workspace = true
 log.workspace = true
+route-recognizer.workspace = true
 

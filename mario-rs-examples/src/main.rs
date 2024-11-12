@@ -7,8 +7,9 @@ use log::info;
 use mario_core::error::Error;
 use mario_core::handler::Endpoint;
 use mario_core::response::Response;
-use mario_core::route::Route;
+use mario_core::route::Router;
 use mario_core::server::Server;
+use mario_core::service::Service;
 use mario_macro::handler;
 
 async fn example() -> Response<String> {
@@ -49,20 +50,17 @@ pub async fn main() {
     tracing_subscriber::fmt::init();
     let response = example().await;
     info!("Response: {:?}", response);
-    let mut server = Server::new();
-    let handler = Arc::new(ExampleHandler);
-    //let handler = create_handler!(ExampleHandler);
-    let route = Route::new(http::Method::GET, "/hello_world".to_string(), handler);
+    let mut server = Server::new(Service::new());
 
-    let handler_1 = Arc::new(hello);
-    let route_1 = Route::new(http::Method::GET, "/hello_world_2".to_string(), handler_1);
+    let mut router: Router = Router::new();
 
-    let handler_2 = Arc::new(world);
-    let route_2 = Route::new(http::Method::GET, "/hello_world_3".to_string(), handler_2);
+    router.get("/hello_world", Arc::new(ExampleHandler));
 
-    server.bind_route(route);
-    // server.bind_route(route_1);
-    // server.bind_route(route_2);
+    router.get("/hello_world_2", Arc::new(hello));
+
+    router.get("/hello_world_3", Arc::new(world));
+
+    server.service.set_routes(router);
 
     server.start_server().await;
 }

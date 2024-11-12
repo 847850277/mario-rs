@@ -33,6 +33,9 @@ impl Request {
             body,
         }
     }
+    pub fn method(&self) -> &http::Method {
+        &self.head.method
+    }
 }
 
 #[derive(Debug, Clone)]
