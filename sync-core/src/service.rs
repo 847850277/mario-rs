@@ -1,12 +1,24 @@
-use crate::route::Route;
+use crate::route::Router;
 
 #[derive(Default)]
 pub struct Service {
-    pub routes: Vec<Route>,
+    pub routes: Router,
 }
 
 impl Service {
     pub fn new() -> Self {
-        Self { routes: Vec::new() }
+        Service {
+            routes: Router::default(),
+        }
+    }
+
+    // set routes
+    pub fn set_routes(&mut self, routes: Router) {
+        self.routes = routes;
+    }
+
+    // get routes
+    pub fn get_routes(&self) -> &Router {
+        &self.routes
     }
 }
