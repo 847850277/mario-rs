@@ -4,9 +4,9 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-log = "0.4.22"
+log.workspace = true
 http.workspace = true
 http-body-util.workspace = true
 bytes.workspace = true
 hyper.workspace = true
-route-recognizer = "0.2"
+route-recognizer.workspace = true

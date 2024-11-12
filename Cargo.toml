@@ -29,5 +29,6 @@ bytes = "1.7.2"
 log = "0.4.22"
 futures = "0.3.30"
 warp = "0.3"
+route-recognizer = "0.2"
 
 

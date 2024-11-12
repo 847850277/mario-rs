@@ -12,26 +12,17 @@ use tokio::net::{TcpListener, TcpStream};
 use tracing::info;
 
 use crate::request::Request as MarioRequest;
-use crate::route::Route;
-use crate::route_matcher::RouteMatcher;
+use crate::route::Router;
 use crate::service::Service;
 
 #[derive(Default)]
 pub struct Server {
-    pub routes: Vec<Route>,
+    pub service: Service,
 }
 
 impl Server {
-    pub fn new() -> Server {
-        Server { routes: vec![] }
-    }
-
-    pub fn bind_route(&mut self, route: Route) {
-        self.routes.push(route);
-    }
-
-    pub fn get_routes(&self) -> Vec<Route> {
-        self.routes.clone()
+    pub fn new(service: Service) -> Self {
+        Self { service }
     }
 
     pub async fn start_server(&self) {
@@ -44,11 +35,12 @@ impl Server {
         //let routes = Arc::new(self.get_routes());
         loop {
             let (stream, _) = listener.accept().await.unwrap();
-            let routers = self.get_routes();
-            let mut service = Service::new();
-            service.set_router(routers);
+            //let routers = self.get_routes();
+            //let mut service = Service::new();
+            //service.set_router(routers);
+            let service1 = self.service.clone();
             tokio::spawn(async move {
-                handle_connection(stream, service).await;
+                handle_connection(stream, service1).await;
             });
         }
     }
@@ -59,25 +51,17 @@ async fn dispatch(
     service: Arc<Service>,
 ) -> Result<Response<Full<Bytes>>, Infallible> {
     let request = MarioRequest::new(request);
-    let routes = service.get_router();
-    let matcher = RouteMatcher::new(Arc::new(routes));
-    let route = matcher.match_route(&request);
-    match route {
-        Some(route) => {
-            info!("Route found: {:?}", route);
-            let response = route.handler.call(&request).await;
-            //info!("Response: {:?}", response);
-            match response {
-                Ok(response) => {
-                    let body = response.get_body().to_string();
-                    Ok(Response::new(Full::new(Bytes::from(body))))
-                }
-                Err(_) => Ok(Response::new(Full::new(Bytes::from(
-                    "500 Internal Server Error",
-                )))),
-            }
+    let router = service.get_routes();
+    let router_match = router.route(request.head.uri.path(), &request.method());
+    let response = router_match.handler.call(&request).await;
+    match response {
+        Ok(response) => {
+            let body = response.get_body().to_string();
+            Ok(Response::new(Full::new(Bytes::from(body))))
         }
-        None => Ok(Response::new(Full::new(Bytes::from("404 Not Found")))),
+        Err(_) => Ok(Response::new(Full::new(Bytes::from(
+            "500 Internal Server Error",
+        )))),
     }
 }
 

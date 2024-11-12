@@ -1,23 +1,24 @@
-use crate::route::Route;
+use crate::route::Router;
 
 #[derive(Default, Clone)]
 pub struct Service {
-    pub router: Vec<Route>,
+    pub routes: Router,
 }
 
-//new
 impl Service {
-    pub fn new() -> Service {
-        Service { router: vec![] }
+    pub fn new() -> Self {
+        Service {
+            routes: Router::default(),
+        }
     }
 
-    // get router
-    pub fn get_router(&self) -> Vec<Route> {
-        self.router.clone()
+    // set routes
+    pub fn set_routes(&mut self, routes: Router) {
+        self.routes = routes;
     }
 
-    // set router
-    pub fn set_router(&mut self, router: Vec<Route>) {
-        self.router = router;
+    // get routes
+    pub fn get_routes(&self) -> &Router {
+        &self.routes
     }
 }
