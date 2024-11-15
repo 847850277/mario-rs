@@ -1,0 +1,8 @@
+[package]
+name = "axum-like-examples"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+axum-like = { workspace = true }
+tokio = { version = "1.0", features = ["full"] }
