@@ -64,6 +64,20 @@ pub fn get<H, B, T>(handler: H) -> OnMethod<H, B, T, EmptyRouter>
     on(MethodFilter::GET | MethodFilter::HEAD, handler)
 }
 
+pub fn post<H, B, T>(handler: H) -> OnMethod<H, B, T, EmptyRouter>
+where
+    H: Handler<B, T>,
+{
+    on(MethodFilter::POST, handler)
+}
+
+pub fn put<H, B, T>(handler: H) -> OnMethod<H, B, T, EmptyRouter>
+where
+    H: Handler<B, T>,
+{
+    on(MethodFilter::PUT, handler)
+}
+
 pub(crate) mod sealed {
     #![allow(unreachable_pub, missing_docs, missing_debug_implementations)]
 
@@ -103,29 +117,29 @@ impl<F, Fut, Res, B> Handler<B, ()> for F
 
 
 
-// OnMethod的方法
+// OnMethod的方法 好像没有什么用
 impl<H, B, T, F> OnMethod<H, B, T, F> {
 
     //get 方法
-    pub fn get<H2, T2>(self, handler: H2) -> OnMethod<H2, B, T2, Self>
-        where
-            H2: Handler<B, T2>,
-    {
-        self.on(MethodFilter::GET | MethodFilter::HEAD, handler)
-    }
-
-
-    pub fn on<H2, T2>(self, method: MethodFilter, handler: H2) -> OnMethod<H2, B, T2, Self>
-        where
-            H2: Handler<B, T2>,
-    {
-        OnMethod {
-            method,
-            handler,
-            fallback: self,
-            _marker: PhantomData,
-        }
-    }
+    // pub fn get<H2, T2>(self, handler: H2) -> OnMethod<H2, B, T2, Self>
+    //     where
+    //         H2: Handler<B, T2>,
+    // {
+    //     self.on(MethodFilter::GET | MethodFilter::HEAD, handler)
+    // }
+    //
+    //
+    // pub fn on<H2, T2>(self, method: MethodFilter, handler: H2) -> OnMethod<H2, B, T2, Self>
+    //     where
+    //         H2: Handler<B, T2>,
+    // {
+    //     OnMethod {
+    //         method,
+    //         handler,
+    //         fallback: self,
+    //         _marker: PhantomData,
+    //     }
+    // }
 
 }
 
