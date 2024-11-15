@@ -78,7 +78,6 @@ impl<B, E> Service<Request<B>> for EmptyRouter<E>
         }
 
         let mut res = Response::new(crate::body::empty());
-
         res.extensions_mut().insert(FromEmptyRouter { request });
 
         *res.status_mut() = self.status;
