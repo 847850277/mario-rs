@@ -1,4 +1,3 @@
-
 use std::{
     borrow::Cow,
     convert::Infallible,
@@ -9,27 +8,22 @@ use std::{
     task::{Context, Poll},
 };
 
-use crate::body::{box_body, BoxBody};
-
-use http::{Request, Response, StatusCode, Uri};
-use tower::{
-    util::{BoxService, ServiceExt},
-    ServiceBuilder,
-};
-use tower_http::map_response_body::MapResponseBodyLayer;
+use http::{Request, Response, StatusCode};
+use tower::util::ServiceExt;
 use tower_layer::Layer;
 use tower_service::Service;
 
-use crate::BoxError;
+use crate::body::BoxBody;
 use crate::router::empty_router::EmptyRouter;
 use crate::router::route::{PathPattern, Route};
 
+pub mod route;
+pub mod empty_router;
 
-mod route;
-mod empty_router;
+pub mod future;
+pub mod method_filter;
 
-mod future;
-
+#[derive(Debug, Clone)]
 pub struct Router<S>{
     svc: S,
 }
@@ -87,4 +81,43 @@ impl<S> Router<S> {
     }
 
 
+    pub fn into_make_service(self) -> IntoMakeService<S>
+        where
+            S: Clone,
+    {
+        IntoMakeService::new(self.svc)
+    }
+
 }
+
+#[derive(Debug, Clone)]
+pub struct IntoMakeService<S> {
+    service: S,
+}
+
+impl<S> IntoMakeService<S> {
+    fn new(service: S) -> Self {
+        Self { service }
+    }
+}
+
+
+impl<S, T> Service<T> for IntoMakeService<S>
+    where
+        S: Clone,
+{
+    type Response = S;
+    type Error = Infallible;
+    type Future = future::MakeRouteServiceFuture<S>;
+
+    fn poll_ready(&mut self, _cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
+        Poll::Ready(Ok(()))
+    }
+
+    fn call(&mut self, _target: T) -> Self::Future {
+        future::MakeRouteServiceFuture {
+            future: ready(Ok(self.service.clone())),
+        }
+    }
+}
+
