@@ -43,26 +43,6 @@ impl<E> Default for Router<EmptyRouter<E>> {
     }
 }
 
-// 为 Router 实现 Service
-impl<S, R> Service<R> for Router<S>
-    where
-        S: Service<R>,
-{
-    type Response = S::Response;
-    type Error = S::Error;
-    type Future = S::Future;
-
-    #[inline]
-    fn poll_ready(&mut self, cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
-        self.svc.poll_ready(cx)
-    }
-
-    #[inline]
-    fn call(&mut self, req: R) -> Self::Future {
-        self.svc.call(req)
-    }
-}
-
 
 impl<S> Router<S> {
     pub fn route<T>(self, description: &str, svc: T) -> Router<Route<T, S>> {

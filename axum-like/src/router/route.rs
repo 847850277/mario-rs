@@ -40,6 +40,8 @@ impl<S, F, B> Service<Request<B>> for Route<S, F>
     }
 
     fn call(&mut self, mut req: Request<B>) -> Self::Future {
+        // print self pattern & fallback
+        println!("pattern: {:?}", self.pattern);
         if let Some(captures) = self.pattern.full_match(&req) {
             insert_url_params(&mut req, captures);
             let fut = self.svc.clone().oneshot(req);
