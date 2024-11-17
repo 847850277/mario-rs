@@ -14,6 +14,7 @@ mod error;
 mod util;
 pub mod handler;
 mod response;
+pub mod extract;
 
 pub use self::router::Router;
 
