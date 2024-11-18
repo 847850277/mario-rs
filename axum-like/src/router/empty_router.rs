@@ -1,10 +1,9 @@
+use super::*;
+use crate::router::future::EmptyRouterFuture;
 use std::convert::Infallible;
 use std::fmt;
 use std::future::ready;
 use std::marker::PhantomData;
-use crate::router::future::EmptyRouterFuture;
-use super::*;
-
 
 // 创建空路由
 // Infallible
@@ -54,8 +53,8 @@ impl<E> fmt::Debug for EmptyRouter<E> {
 // 为 EmptyRouter 实现 Service
 
 impl<B, E> Service<Request<B>> for EmptyRouter<E>
-    where
-        B: Send + Sync + 'static,
+where
+    B: Send + Sync + 'static,
 {
     type Response = Response<BoxBody>;
     type Error = E;

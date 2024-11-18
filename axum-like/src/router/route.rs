@@ -1,11 +1,10 @@
 // 路由机制：使用 正则表达式
 use super::*;
 
-use bytes::Bytes;
-use regex::Regex;
 use crate::router::future::RouteFuture;
 use crate::util::ByteStr;
-
+use bytes::Bytes;
+use regex::Regex;
 
 #[derive(Debug, Clone)]
 pub(crate) struct PathPattern(Arc<Inner>);
@@ -26,10 +25,10 @@ pub struct Route<S, F> {
 
 // B 代表 Body
 impl<S, F, B> Service<Request<B>> for Route<S, F>
-    where
-        S: Service<Request<B>, Response = Response<BoxBody>> + Clone,
-        F: Service<Request<B>, Response = Response<BoxBody>, Error = S::Error> + Clone,
-        B: Send + Sync + 'static,
+where
+    S: Service<Request<B>, Response = Response<BoxBody>> + Clone,
+    F: Service<Request<B>, Response = Response<BoxBody>, Error = S::Error> + Clone,
+    B: Send + Sync + 'static,
 {
     type Response = Response<BoxBody>;
     type Error = S::Error;
@@ -70,7 +69,6 @@ fn insert_url_params<B>(req: &mut Request<B>, params: Vec<(String, String)>) {
             .insert(Some(UrlParams(params.collect())));
     }
 }
-
 
 impl PathPattern {
     pub(crate) fn new(pattern: &str) -> Self {

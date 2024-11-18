@@ -1,6 +1,7 @@
 use crate::{
     body::{box_body, BoxBody},
-    BoxError, error::Error,
+    error::Error,
+    BoxError,
 };
 
 use bytes::Bytes;
@@ -10,7 +11,6 @@ use http_body::{
     Empty, Full,
 };
 use std::{borrow::Cow, convert::Infallible};
-
 
 pub trait IntoResponse {
     /// The body type of the response.

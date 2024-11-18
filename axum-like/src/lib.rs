@@ -3,18 +3,17 @@ pub use http;
 pub use hyper::Server;
 pub use tower_http::add_extension::{AddExtension, AddExtensionLayer};
 
-
 #[macro_use]
 mod macros;
 
-pub mod router;
 mod body;
 mod error;
+pub mod router;
 
-mod util;
+pub mod extract;
 pub mod handler;
 mod response;
-pub mod extract;
+mod util;
 
 pub use self::router::Router;
 

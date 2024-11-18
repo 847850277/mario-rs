@@ -1,19 +1,18 @@
 use std::future::Future;
 use std::net::SocketAddr;
 
-use axum_like::{handler::get,handler::post, Router};
-use axum_like::handler::put;
 use axum_like::extract::{Query, TypedHeader};
+use axum_like::handler::put;
+use axum_like::{handler::get, handler::post, Router};
 
 #[tokio::main]
 async fn main() {
     // build our application with a route
     let app = Router::new()
         .route("/", get(handler))
-        .route("/post",post(post_handler))
-        .route("/put",put(put_handler))
-        .route("/page", get(page_handler))
-        ;
+        .route("/post", post(post_handler))
+        .route("/put", put(put_handler))
+        .route("/page", get(page_handler));
 
     // run it
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
@@ -34,7 +33,6 @@ async fn post_handler() -> &'static str {
 async fn put_handler() -> &'static str {
     "<h1> Put Hello, World!</h1>"
 }
-
 
 use serde::Deserialize;
 

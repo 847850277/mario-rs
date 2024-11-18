@@ -1,4 +1,4 @@
-use super::{ FromRequest, RequestParts, QueryRejection, FailedToDeserializeQueryString};
+use super::{FailedToDeserializeQueryString, FromRequest, QueryRejection, RequestParts};
 use async_trait::async_trait;
 use serde::de::DeserializeOwned;
 use std::ops::Deref;
