@@ -65,6 +65,13 @@ impl<S> Router<S> {
     {
         IntoMakeService::new(self.svc)
     }
+
+    pub fn layer<L>(self, layer: L) -> Router<Layered<L::Service>>
+    where
+        L: Layer<S>,
+    {
+        self.map(|svc| Layered::new(layer.layer(svc)))
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -94,5 +101,54 @@ where
         future::MakeRouteServiceFuture {
             future: ready(Ok(self.service.clone())),
         }
+    }
+}
+
+pub struct Layered<S> {
+    inner: S,
+}
+
+impl<S> Layered<S> {
+    fn new(inner: S) -> Self {
+        Self { inner }
+    }
+}
+
+impl<S> Clone for Layered<S>
+where
+    S: Clone,
+{
+    fn clone(&self) -> Self {
+        Self::new(self.inner.clone())
+    }
+}
+
+impl<S> fmt::Debug for Layered<S>
+where
+    S: fmt::Debug,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Layered")
+            .field("inner", &self.inner)
+            .finish()
+    }
+}
+
+impl<S, R> Service<R> for Layered<S>
+where
+    S: Service<R>,
+{
+    type Response = S::Response;
+    type Error = S::Error;
+    type Future = S::Future;
+
+    #[inline]
+    fn poll_ready(&mut self, cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
+        self.inner.poll_ready(cx)
+    }
+
+    #[inline]
+    fn call(&mut self, req: R) -> Self::Future {
+        self.inner.call(req)
     }
 }
