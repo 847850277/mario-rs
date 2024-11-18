@@ -5,38 +5,6 @@ use std::ops::Deref;
 
 /// Extractor that deserializes query strings into some type.
 ///
-/// `T` is expected to implement [`serde::Deserialize`].
-///
-/// # Example
-///
-/// ```rust,no_run
-/// use axum::{
-///     extract::Query,
-///     handler::get,
-///     Router,
-/// };
-/// use serde::Deserialize;
-///
-/// #[derive(Deserialize)]
-/// struct Pagination {
-///     page: usize,
-///     per_page: usize,
-/// }
-///
-/// // This will parse query strings like `?page=2&per_page=30` into `Pagination`
-/// // structs.
-/// async fn list_things(pagination: Query<Pagination>) {
-///     let pagination: Pagination = pagination.0;
-///
-///     // ...
-/// }
-///
-/// let app = Router::new().route("/list_things", get(list_things));
-/// # async {
-/// # axum::Server::bind(&"".parse().unwrap()).serve(app.into_make_service()).await.unwrap();
-/// # };
-/// ```
-///
 /// If the query string cannot be parsed it will reject the request with a `400
 /// Bad Request` response.
 #[derive(Debug, Clone, Copy, Default)]
