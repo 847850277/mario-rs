@@ -1,11 +1,13 @@
 use std::{
     convert::Infallible,
+    fmt,
     future::Future,
     marker::PhantomData,
     task::{Context, Poll},
 };
 
 use async_trait::async_trait;
+use bytes::Bytes;
 use http::{Request, Response};
 use tower::ServiceExt;
 use tower_service::Service;
@@ -17,6 +19,7 @@ use crate::{
     body::{box_body, BoxBody},
     router::empty_router::EmptyRouter,
     util::Either,
+    BoxError,
 };
 
 mod future;
@@ -215,6 +218,64 @@ where
         future::OnMethodFuture {
             inner: fut,
             req_method,
+        }
+    }
+}
+
+pub struct Layered<S, T> {
+    svc: S,
+    _input: PhantomData<fn() -> T>,
+}
+
+impl<S, T> fmt::Debug for Layered<S, T>
+where
+    S: fmt::Debug,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Layered").field("svc", &self.svc).finish()
+    }
+}
+
+impl<S, T> Clone for Layered<S, T>
+where
+    S: Clone,
+{
+    fn clone(&self) -> Self {
+        Self::new(self.svc.clone())
+    }
+}
+
+#[async_trait]
+impl<S, T, ReqBody, ResBody> Handler<ReqBody, T> for Layered<S, T>
+where
+    S: Service<Request<ReqBody>, Response = Response<ResBody>> + Clone + Send + 'static,
+    S::Error: IntoResponse,
+    S::Future: Send,
+    T: 'static,
+    ReqBody: Send + 'static,
+    ResBody: http_body::Body<Data = Bytes> + Send + Sync + 'static,
+    ResBody::Error: Into<BoxError> + Send + Sync + 'static,
+{
+    type Sealed = sealed::Hidden;
+
+    async fn call(self, req: Request<ReqBody>) -> Response<BoxBody> {
+        match self
+            .svc
+            .oneshot(req)
+            .await
+            .map_err(IntoResponse::into_response)
+        {
+            Ok(res) => res.map(box_body),
+            Err(res) => res.map(box_body),
+        }
+    }
+}
+
+impl<S, T> Layered<S, T> {
+    pub(crate) fn new(svc: S) -> Self {
+        Self {
+            svc,
+            _input: PhantomData,
         }
     }
 }

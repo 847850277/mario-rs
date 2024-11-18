@@ -12,7 +12,7 @@ pub mod router;
 
 pub mod extract;
 pub mod handler;
-mod response;
+pub mod response;
 mod util;
 
 pub use self::router::Router;
