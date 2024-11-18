@@ -55,7 +55,12 @@ pub trait Service<Request> {
 
 call 如何被触发调用的？
 
-![画板](img/yuque_mind.jpeg)
+## handler 时序图
+![画板](img/handler.jpeg)
+
+
+## extra 时序图
+![画板](img/extra.jpeg)
 
 
 
