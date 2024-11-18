@@ -6,7 +6,6 @@ pub struct Error {
     inner: BoxError,
 }
 
-
 impl Error {
     pub(crate) fn new(error: impl Into<BoxError>) -> Self {
         Self {

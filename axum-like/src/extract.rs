@@ -1,17 +1,16 @@
-use crate::{response::IntoResponse, error::Error};
+use crate::{error::Error, response::IntoResponse};
 use async_trait::async_trait;
 use http::{header, Extensions, HeaderMap, Method, Request, Uri, Version};
 use rejection::*;
 use std::convert::Infallible;
 
-pub mod request_parts;
-pub mod rejection;
 pub mod builtin;
+pub mod rejection;
+pub mod request_parts;
 
 pub use self::{
+    builtin::{Query, TypedHeader},
     request_parts::{Body, BodyStream},
-    builtin::{TypedHeader, Query},
-
 };
 
 #[async_trait]

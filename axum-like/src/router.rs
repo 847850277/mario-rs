@@ -17,14 +17,14 @@ use crate::body::BoxBody;
 use crate::router::empty_router::EmptyRouter;
 use crate::router::route::{PathPattern, Route};
 
-pub mod route;
 pub mod empty_router;
+pub mod route;
 
 pub mod future;
 pub mod method_filter;
 
 #[derive(Debug, Clone)]
-pub struct Router<S>{
+pub struct Router<S> {
     svc: S,
 }
 
@@ -43,7 +43,6 @@ impl<E> Default for Router<EmptyRouter<E>> {
     }
 }
 
-
 impl<S> Router<S> {
     pub fn route<T>(self, description: &str, svc: T) -> Router<Route<T, S>> {
         self.map(|fallback| Route {
@@ -54,20 +53,18 @@ impl<S> Router<S> {
     }
 
     fn map<F, S2>(self, f: F) -> Router<S2>
-        where
-            F: FnOnce(S) -> S2,
+    where
+        F: FnOnce(S) -> S2,
     {
         Router { svc: f(self.svc) }
     }
 
-
     pub fn into_make_service(self) -> IntoMakeService<S>
-        where
-            S: Clone,
+    where
+        S: Clone,
     {
         IntoMakeService::new(self.svc)
     }
-
 }
 
 #[derive(Debug, Clone)]
@@ -81,10 +78,9 @@ impl<S> IntoMakeService<S> {
     }
 }
 
-
 impl<S, T> Service<T> for IntoMakeService<S>
-    where
-        S: Clone,
+where
+    S: Clone,
 {
     type Response = S;
     type Error = Infallible;
@@ -100,4 +96,3 @@ impl<S, T> Service<T> for IntoMakeService<S>
         }
     }
 }
-

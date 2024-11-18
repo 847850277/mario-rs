@@ -1,6 +1,5 @@
 use std::{
-    convert::Infallible
-    ,
+    convert::Infallible,
     future::Future,
     marker::PhantomData,
     task::{Context, Poll},
@@ -11,14 +10,14 @@ use http::{Request, Response};
 use tower::ServiceExt;
 use tower_service::Service;
 
+use crate::extract::FromRequest;
+use crate::response::IntoResponse;
+use crate::router::method_filter::MethodFilter;
 use crate::{
     body::{box_body, BoxBody},
     router::empty_router::EmptyRouter,
     util::Either,
 };
-use crate::response::IntoResponse;
-use crate::router::method_filter::MethodFilter;
-use crate::extract::FromRequest;
 
 mod future;
 
@@ -30,9 +29,9 @@ pub struct OnMethod<H, B, T, F> {
 }
 
 impl<H, B, T, F> Clone for OnMethod<H, B, T, F>
-    where
-        H: Clone,
-        F: Clone,
+where
+    H: Clone,
+    F: Clone,
 {
     fn clone(&self) -> Self {
         Self {
@@ -46,8 +45,8 @@ impl<H, B, T, F> Clone for OnMethod<H, B, T, F>
 
 // 这个是什么意思?
 pub fn on<H, B, T>(method: MethodFilter, handler: H) -> OnMethod<H, B, T, EmptyRouter>
-    where
-        H: Handler<B, T>,
+where
+    H: Handler<B, T>,
 {
     //println!("on, method: {:?}, handler: {:?}", method, handler);
     OnMethod {
@@ -59,8 +58,8 @@ pub fn on<H, B, T>(method: MethodFilter, handler: H) -> OnMethod<H, B, T, EmptyR
 }
 
 pub fn get<H, B, T>(handler: H) -> OnMethod<H, B, T, EmptyRouter>
-    where
-        H: Handler<B, T>,
+where
+    H: Handler<B, T>,
 {
     on(MethodFilter::GET | MethodFilter::HEAD, handler)
 }
@@ -98,15 +97,14 @@ pub trait Handler<B, T>: Clone + Send + Sized + 'static {
     async fn call(self, req: Request<B>) -> Response<BoxBody>;
 }
 
-
 // 异步的方法实现handler，如example里面的handler方法
 #[async_trait]
 impl<F, Fut, Res, B> Handler<B, ()> for F
-    where
-        F: FnOnce() -> Fut + Clone + Send + Sync + 'static,
-        Fut: Future<Output = Res> + Send,
-        Res: IntoResponse,
-        B: Send + 'static,
+where
+    F: FnOnce() -> Fut + Clone + Send + Sync + 'static,
+    Fut: Future<Output = Res> + Send,
+    Res: IntoResponse,
+    B: Send + 'static,
 {
     type Sealed = sealed::Hidden;
 
@@ -118,13 +116,13 @@ impl<F, Fut, Res, B> Handler<B, ()> for F
 
 // 异步的方法实现一个参数handler，如example里面的page_handler方法
 #[async_trait]
-impl<F, Fut, Res, B,T> Handler<B, (T,)> for F
-    where
-        F: FnOnce(T) -> Fut + Clone + Send + Sync + 'static,
-        Fut: Future<Output = Res> + Send,
-        Res: IntoResponse,
-        T: crate::extract::FromRequest<B> + Send,
-        B: Send + 'static,
+impl<F, Fut, Res, B, T> Handler<B, (T,)> for F
+where
+    F: FnOnce(T) -> Fut + Clone + Send + Sync + 'static,
+    Fut: Future<Output = Res> + Send,
+    Res: IntoResponse,
+    T: crate::extract::FromRequest<B> + Send,
+    B: Send + 'static,
 {
     type Sealed = sealed::Hidden;
 
@@ -133,13 +131,12 @@ impl<F, Fut, Res, B,T> Handler<B, (T,)> for F
         //res.into_response().map(box_body)
         let mut req = crate::extract::RequestParts::new(req);
         let value = match T::from_request(&mut req).await {
-                    Ok(value) => value,
-                    Err(rejection) => return rejection.into_response().map(box_body),
-                };
+            Ok(value) => value,
+            Err(rejection) => return rejection.into_response().map(box_body),
+        };
         self(value).await.into_response().map(box_body)
     }
 }
-
 
 // 用宏实现多参数的支持
 // extract 支持
@@ -189,14 +186,12 @@ impl<F, Fut, Res, B,T> Handler<B, (T,)> for F
 //
 // impl_handler!(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16);
 
-
-
 // OnMethod 实现 Service
 impl<H, B, T, F> Service<Request<B>> for OnMethod<H, B, T, F>
-    where
-        H: Handler<B, T>,
-        F: Service<Request<B>, Response = Response<BoxBody>, Error = Infallible> + Clone,
-        B: Send + 'static,
+where
+    H: Handler<B, T>,
+    F: Service<Request<B>, Response = Response<BoxBody>, Error = Infallible> + Clone,
+    B: Send + 'static,
 {
     type Response = Response<BoxBody>;
     type Error = Infallible;
@@ -223,4 +218,3 @@ impl<H, B, T, F> Service<Request<B>> for OnMethod<H, B, T, F>
         }
     }
 }
-

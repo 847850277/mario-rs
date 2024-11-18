@@ -1,4 +1,3 @@
-
 use super::*;
 use futures_util::ready;
 use http::{Request, Response};
@@ -16,8 +15,8 @@ use tower::{
 };
 use tower_service::Service;
 
-use crate::BoxError;
 use crate::router::empty_router::FromEmptyRouter;
+use crate::BoxError;
 
 opaque_future! {
     /// Response future for [`EmptyRouter`](super::EmptyRouter).
@@ -124,7 +123,6 @@ where
         }
     }
 }
-
 
 // pin_project! {
 //     /// The response future for [`BoxRoute`](super::BoxRoute).
