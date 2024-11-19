@@ -1,11 +1,12 @@
+use std::convert::Infallible;
 use http::header::USER_AGENT;
-use http::HeaderValue;
+use http::{HeaderValue, StatusCode};
 use std::future::Future;
 use std::net::SocketAddr;
 
 use axum_like::extract::{Body, Query, TypedHeader};
 use axum_like::handler::put;
-use axum_like::{handler::get, handler::post, response::IntoResponse, Router};
+use axum_like::{BoxError, handler::get, handler::post, response::IntoResponse, Router};
 
 #[tokio::main]
 async fn main() {
@@ -19,6 +20,21 @@ async fn main() {
             USER_AGENT,
             HeaderValue::from_static("axum-like demo"),
         ));
+
+    // handler error
+    // let app = app.handle_error(|error: BoxError| {
+    //     if error.is::<tower::timeout::error::Elapsed>() {
+    //         Ok::<_, Infallible>((
+    //             StatusCode::REQUEST_TIMEOUT,
+    //             "request took too long".to_string(),
+    //         ))
+    //     } else {
+    //         Ok::<_, Infallible>((
+    //             StatusCode::INTERNAL_SERVER_ERROR,
+    //             format!("Unhandled internal error: {}", error),
+    //         ))
+    //     }
+    // });
 
     // run it
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
