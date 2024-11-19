@@ -22,19 +22,13 @@ async fn main() {
         ));
 
     // handler error
-    // let app = app.handle_error(|error: BoxError| {
-    //     if error.is::<tower::timeout::error::Elapsed>() {
-    //         Ok::<_, Infallible>((
-    //             StatusCode::REQUEST_TIMEOUT,
-    //             "request took too long".to_string(),
-    //         ))
-    //     } else {
-    //         Ok::<_, Infallible>((
-    //             StatusCode::INTERNAL_SERVER_ERROR,
-    //             format!("Unhandled internal error: {}", error),
-    //         ))
-    //     }
-    // });
+    // handler error
+    let app = app.handle_error(|error: Infallible| {
+        Ok::<_, Infallible>((
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Unhandled internal error".to_string(),
+        ))
+    });
 
     // run it
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
