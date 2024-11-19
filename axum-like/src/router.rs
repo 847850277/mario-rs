@@ -14,6 +14,7 @@ use tower_layer::Layer;
 use tower_service::Service;
 
 use crate::body::BoxBody;
+use crate::handler::HandleError;
 use crate::router::empty_router::EmptyRouter;
 use crate::router::route::{PathPattern, Route};
 
@@ -71,6 +72,10 @@ impl<S> Router<S> {
         L: Layer<S>,
     {
         self.map(|svc| Layered::new(layer.layer(svc)))
+    }
+
+    pub fn handle_error<ReqBody, F>(self, f: F) -> Router<HandleError<S, F, ReqBody>> {
+        self.map(|svc| HandleError::new(svc, f))
     }
 }
 

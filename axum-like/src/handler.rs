@@ -9,6 +9,7 @@ use std::{
 use async_trait::async_trait;
 use bytes::Bytes;
 use http::{Request, Response};
+use tower::util::Oneshot;
 use tower::ServiceExt;
 use tower_service::Service;
 
@@ -276,6 +277,87 @@ impl<S, T> Layered<S, T> {
         Self {
             svc,
             _input: PhantomData,
+        }
+    }
+
+    pub fn handle_error<F, ReqBody, ResBody, Res, E>(
+        self,
+        f: F,
+    ) -> Layered<HandleError<S, F, ReqBody>, T>
+    where
+        S: Service<Request<ReqBody>, Response = Response<ResBody>>,
+        F: FnOnce(S::Error) -> Result<Res, E>,
+        Res: IntoResponse,
+    {
+        let svc = HandleError::new(self.svc, f);
+        Layered::new(svc)
+    }
+}
+
+/// A [`Service`] adapter that handles errors with a closure.
+///
+/// Created with
+/// [`handler::Layered::handle_error`](crate::handler::Layered::handle_error) or
+/// [`routing::Router::handle_error`](crate::routing::Router::handle_error).
+/// See those methods for more details.
+pub struct HandleError<S, F, B> {
+    inner: S,
+    f: F,
+    _marker: PhantomData<fn() -> B>,
+}
+
+impl<S, F, B> Clone for HandleError<S, F, B>
+where
+    S: Clone,
+    F: Clone,
+{
+    fn clone(&self) -> Self {
+        Self::new(self.inner.clone(), self.f.clone())
+    }
+}
+
+impl<S, F, B> HandleError<S, F, B> {
+    pub(crate) fn new(inner: S, f: F) -> Self {
+        Self {
+            inner,
+            f,
+            _marker: PhantomData,
+        }
+    }
+}
+
+impl<S, F, B> fmt::Debug for HandleError<S, F, B>
+where
+    S: fmt::Debug,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("HandleError")
+            .field("inner", &self.inner)
+            .field("f", &format_args!("{}", std::any::type_name::<F>()))
+            .finish()
+    }
+}
+
+impl<S, F, ReqBody, ResBody, Res, E> Service<Request<ReqBody>> for HandleError<S, F, ReqBody>
+where
+    S: Service<Request<ReqBody>, Response = Response<ResBody>> + Clone,
+    F: FnOnce(S::Error) -> Result<Res, E> + Clone,
+    Res: IntoResponse,
+    ResBody: http_body::Body<Data = Bytes> + Send + Sync + 'static,
+    ResBody::Error: Into<BoxError> + Send + Sync + 'static,
+{
+    type Response = Response<BoxBody>;
+    type Error = E;
+    type Future = future::HandleErrorFuture<Oneshot<S, Request<ReqBody>>, F>;
+
+    fn poll_ready(&mut self, _cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
+        Poll::Ready(Ok(()))
+    }
+
+    fn call(&mut self, req: Request<ReqBody>) -> Self::Future {
+        future::HandleErrorFuture {
+            f: Some(self.f.clone()),
+            inner: self.inner.clone().oneshot(req),
         }
     }
 }
