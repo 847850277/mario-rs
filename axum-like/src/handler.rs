@@ -9,8 +9,8 @@ use std::{
 use async_trait::async_trait;
 use bytes::Bytes;
 use http::{Request, Response};
-use tower::ServiceExt;
 use tower::util::Oneshot;
+use tower::ServiceExt;
 use tower_service::Service;
 
 use crate::extract::FromRequest;
@@ -284,18 +284,15 @@ impl<S, T> Layered<S, T> {
         self,
         f: F,
     ) -> Layered<HandleError<S, F, ReqBody>, T>
-        where
-            S: Service<Request<ReqBody>, Response = Response<ResBody>>,
-            F: FnOnce(S::Error) -> Result<Res, E>,
-            Res: IntoResponse,
+    where
+        S: Service<Request<ReqBody>, Response = Response<ResBody>>,
+        F: FnOnce(S::Error) -> Result<Res, E>,
+        Res: IntoResponse,
     {
         let svc = HandleError::new(self.svc, f);
         Layered::new(svc)
     }
-
 }
-
-
 
 /// A [`Service`] adapter that handles errors with a closure.
 ///
@@ -310,9 +307,9 @@ pub struct HandleError<S, F, B> {
 }
 
 impl<S, F, B> Clone for HandleError<S, F, B>
-    where
-        S: Clone,
-        F: Clone,
+where
+    S: Clone,
+    F: Clone,
 {
     fn clone(&self) -> Self {
         Self::new(self.inner.clone(), self.f.clone())
@@ -330,8 +327,8 @@ impl<S, F, B> HandleError<S, F, B> {
 }
 
 impl<S, F, B> fmt::Debug for HandleError<S, F, B>
-    where
-        S: fmt::Debug,
+where
+    S: fmt::Debug,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("HandleError")
@@ -342,12 +339,12 @@ impl<S, F, B> fmt::Debug for HandleError<S, F, B>
 }
 
 impl<S, F, ReqBody, ResBody, Res, E> Service<Request<ReqBody>> for HandleError<S, F, ReqBody>
-    where
-        S: Service<Request<ReqBody>, Response = Response<ResBody>> + Clone,
-        F: FnOnce(S::Error) -> Result<Res, E> + Clone,
-        Res: IntoResponse,
-        ResBody: http_body::Body<Data = Bytes> + Send + Sync + 'static,
-        ResBody::Error: Into<BoxError> + Send + Sync + 'static,
+where
+    S: Service<Request<ReqBody>, Response = Response<ResBody>> + Clone,
+    F: FnOnce(S::Error) -> Result<Res, E> + Clone,
+    Res: IntoResponse,
+    ResBody: http_body::Body<Data = Bytes> + Send + Sync + 'static,
+    ResBody::Error: Into<BoxError> + Send + Sync + 'static,
 {
     type Response = Response<BoxBody>;
     type Error = E;

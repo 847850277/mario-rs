@@ -1,12 +1,12 @@
-use std::convert::Infallible;
 use http::header::USER_AGENT;
 use http::{HeaderValue, StatusCode};
+use std::convert::Infallible;
 use std::future::Future;
 use std::net::SocketAddr;
 
 use axum_like::extract::{Body, Query, TypedHeader};
 use axum_like::handler::put;
-use axum_like::{BoxError, handler::get, handler::post, response::IntoResponse, Router};
+use axum_like::{handler::get, handler::post, response::IntoResponse, BoxError, Router};
 
 #[tokio::main]
 async fn main() {

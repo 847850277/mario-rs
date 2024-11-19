@@ -1,5 +1,8 @@
 use crate::body::{box_body, BoxBody};
+use crate::response::IntoResponse;
 use crate::util::{Either, EitherProj};
+use crate::BoxError;
+use bytes::Bytes;
 use futures_util::{
     future::{BoxFuture, Map},
     ready,
@@ -14,12 +17,8 @@ use std::{
     pin::Pin,
     task::{Context, Poll},
 };
-use bytes::Bytes;
 use tower::util::Oneshot;
 use tower_service::Service;
-use crate::BoxError;
-use crate::response::IntoResponse;
-
 
 pin_project! {
     /// Response future for [`HandleError`](super::HandleError).
@@ -32,12 +31,12 @@ pin_project! {
 }
 
 impl<Fut, F, E, E2, B, Res> Future for HandleErrorFuture<Fut, F>
-    where
-        Fut: Future<Output = Result<Response<B>, E>>,
-        F: FnOnce(E) -> Result<Res, E2>,
-        Res: IntoResponse,
-        B: http_body::Body<Data = Bytes> + Send + Sync + 'static,
-        B::Error: Into<BoxError> + Send + Sync + 'static,
+where
+    Fut: Future<Output = Result<Response<B>, E>>,
+    F: FnOnce(E) -> Result<Res, E2>,
+    Res: IntoResponse,
+    B: http_body::Body<Data = Bytes> + Send + Sync + 'static,
+    B::Error: Into<BoxError> + Send + Sync + 'static,
 {
     type Output = Result<Response<BoxBody>, E2>;
 

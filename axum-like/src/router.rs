@@ -77,7 +77,6 @@ impl<S> Router<S> {
     pub fn handle_error<ReqBody, F>(self, f: F) -> Router<HandleError<S, F, ReqBody>> {
         self.map(|svc| HandleError::new(svc, f))
     }
-
 }
 
 #[derive(Debug, Clone)]
@@ -158,4 +157,3 @@ where
         self.inner.call(req)
     }
 }
-
