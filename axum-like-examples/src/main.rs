@@ -19,8 +19,7 @@ async fn main() {
         .layer(SetRequestHeaderLayer::<_, Body>::overriding(
             USER_AGENT,
             HeaderValue::from_static("axum-like demo"),
-        ))
-        ;
+        ));
 
     // handler error
     let app = app.handle_error(|error: Infallible| {
