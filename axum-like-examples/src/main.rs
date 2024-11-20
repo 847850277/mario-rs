@@ -19,9 +19,9 @@ async fn main() {
         .layer(SetRequestHeaderLayer::<_, Body>::overriding(
             USER_AGENT,
             HeaderValue::from_static("axum-like demo"),
-        ));
+        ))
+        ;
 
-    // handler error
     // handler error
     let app = app.handle_error(|error: Infallible| {
         Ok::<_, Infallible>((
@@ -63,6 +63,10 @@ async fn handler(user_agent: Option<TypedHeader<headers::UserAgent>>) -> impl In
 }
 
 async fn post_handler() -> &'static str {
+    // parse int
+    // let s = "sss";
+    // let i = s.parse::<i32>().unwrap();
+    // println!("i: {}", i);
     "<h1> Post Hello, World!</h1>"
 }
 
