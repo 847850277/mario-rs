@@ -7,7 +7,7 @@ edition = "2021"
 [workspace]
 members = [
     "mario-core", "mario-macro",
-    "mario-rs-examples", "sync-core", "other-examples", "sync-examples", "hyper-examples", "axum-like", "axum-like-examples",
+    "mario-rs-examples", "sync-core", "other-examples", "sync-examples", "hyper-examples", "axum-like", "axum-like-examples", "axum-examples",
 ]
 resolver = "2"
 
