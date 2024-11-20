@@ -66,3 +66,6 @@ pub trait Service<Request> {
 
 
 https://github.com/davidpdrsn/axum-handle-error-slow-compile
+
+
+https://docs.rs/axum/latest/axum/error_handling/index.html
