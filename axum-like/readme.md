@@ -63,6 +63,9 @@ pub trait Service<Request> {
 
 ![画板](img/extra.jpeg)
 
+## handler_error 时序图
+
+![画板](img/handler_error.jpeg)
 
 
 https://github.com/davidpdrsn/axum-handle-error-slow-compile

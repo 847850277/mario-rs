@@ -27,7 +27,7 @@ async fn main() {
             "/",
             get(|| async {
                 // simulate a long request
-                tokio::time::sleep(Duration::from_secs(29)).await;
+                tokio::time::sleep(Duration::from_secs(11)).await;
                 "Hello, World!"
             }),
         )
@@ -36,7 +36,7 @@ async fn main() {
                 // `timeout` will produce an error if the handler takes
                 // too long so we must handle those
                 .layer(HandleErrorLayer::new(handle_timeout_error))
-                .timeout(Duration::from_secs(30)),
+                .timeout(Duration::from_secs(10)),
         );
 
     axum::Server::bind(&"0.0.0.0:3000".parse().unwrap())

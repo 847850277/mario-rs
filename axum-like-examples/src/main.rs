@@ -3,6 +3,8 @@ use http::{HeaderValue, StatusCode};
 use std::convert::Infallible;
 use std::future::Future;
 use std::net::SocketAddr;
+use std::thread::Thread;
+use std::time::Duration;
 
 use axum_like::extract::{Body, Query, TypedHeader};
 use axum_like::handler::put;
@@ -19,15 +21,15 @@ async fn main() {
         .layer(SetRequestHeaderLayer::<_, Body>::overriding(
             USER_AGENT,
             HeaderValue::from_static("axum-like demo"),
-        ));
-
-    // handler error
-    let app = app.handle_error(|error: Infallible| {
-        Ok::<_, Infallible>((
-            StatusCode::INTERNAL_SERVER_ERROR,
-            "Unhandled internal error".to_string(),
         ))
-    });
+        .layer(TimeoutLayer::new(Duration::from_secs(10)))
+        .handle_error(|error: BoxError| {
+            println!("Unhandled internal error: {}", error);
+            Ok::<_, Infallible>((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("Unhandled internal 111 error: {}", error),
+            ))
+        });
 
     // run it
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
@@ -66,6 +68,8 @@ async fn post_handler() -> &'static str {
     // let s = "sss";
     // let i = s.parse::<i32>().unwrap();
     // println!("i: {}", i);
+    //Thread::sleep(Duration::from_secs(11));
+    tokio::time::sleep(Duration::from_secs(11)).await;
     "<h1> Post Hello, World!</h1>"
 }
 
@@ -74,6 +78,8 @@ async fn put_handler() -> &'static str {
 }
 
 use serde::Deserialize;
+use tower::timeout::TimeoutLayer;
+use tower::Layer;
 use tower_http::set_header::SetRequestHeaderLayer;
 
 #[derive(Deserialize, Debug)]
