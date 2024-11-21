@@ -355,6 +355,7 @@ where
     }
 
     fn call(&mut self, req: Request<ReqBody>) -> Self::Future {
+        println!("HandleError call");
         future::HandleErrorFuture {
             f: Some(self.f.clone()),
             inner: self.inner.clone().oneshot(req),

@@ -14,7 +14,6 @@ pub mod extract;
 pub mod handler;
 pub mod response;
 mod util;
-
 pub use self::router::Router;
 
 /// Alias for a type-erased error type.
