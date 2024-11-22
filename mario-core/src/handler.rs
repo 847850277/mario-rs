@@ -6,8 +6,5 @@ use std::future::Future;
 use std::pin::Pin;
 
 pub trait Endpoint: Debug + Sync + Send {
-    fn call(
-        &self,
-        req: &Request,
-    ) -> Pin<Box<dyn Future<Output = Result<Response<String>, Error>> + Send>>;
+    fn call(&self, req: &Request) -> Result<Response<String>, Error>;
 }

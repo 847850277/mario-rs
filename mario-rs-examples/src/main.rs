@@ -15,11 +15,10 @@ use mario_macro::handler;
 async fn example() -> Response<String> {
     Response::new("run example".to_string())
 }
-async fn example_1() -> String {
+fn example_1() -> String {
     "run example_1".to_string()
 }
-
-async fn example_2(i: i32) -> String {
+fn example_2(i: i32) -> String {
     let string = format!("run example_2: {}", i);
     println!("{}", string);
     string
@@ -29,47 +28,34 @@ async fn example_2(i: i32) -> String {
 pub struct ExampleHandler;
 
 impl Endpoint for ExampleHandler {
-    fn call(
-        &self,
-        _req: &mario_core::request::Request,
-    ) -> Pin<Box<dyn Future<Output = Result<Response<String>, Error>> + Send>> {
-        Box::pin(async move {
-            let response = example_1().await;
-            Ok(Response::new(response.to_string()))
-        })
+    fn call(&self, _req: &mario_core::request::Request) -> Result<Response<String>, Error> {
+        let response = example_1();
+        Ok(Response::new(response.to_string()))
     }
 }
 
 #[handler]
-async fn hello() -> i32 {
+fn hello() -> i32 {
     2
 }
 
 #[handler]
-async fn world() -> String {
+fn world() -> String {
     "example_3".to_string()
 }
-
 
 #[derive(Debug, Default)]
 pub struct ExtraExample;
 
 impl Endpoint for ExtraExample {
-    fn call(
-        &self,
-        req: &mario_core::request::Request,
-    ) -> Pin<Box<dyn Future<Output = Result<Response<String>, Error>> + Send>> {
+    fn call(&self, req: &mario_core::request::Request) -> Result<Response<String>, Error> {
         let copy_req = Arc::new(req.clone());
-        Box::pin(async move {
-            let query = copy_req.head.uri.query().unwrap_or_default();
-            info!("query: {:?}", query);
-            let response = example_2(1).await;
-            Ok(Response::new(response.to_string()))
-        })
+        let query = copy_req.head.uri.query().unwrap_or_default();
+        info!("query: {:?}", query);
+        let response = example_2(1);
+        Ok(Response::new(response.to_string()))
     }
 }
-
-
 
 #[tokio::main]
 pub async fn main() {
