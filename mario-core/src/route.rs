@@ -22,12 +22,9 @@ impl Endpoint for NotFound {
     fn call(
         &self,
         _req: &crate::request::Request,
-    ) -> Pin<Box<dyn Future<Output = Result<crate::response::Response<String>, Error>> + Send>>
-    {
-        Box::pin(async move {
-            let response = "Not Found";
-            Ok(crate::response::Response::new(response.to_string()))
-        })
+    ) -> Result<crate::response::Response<String>, Error> {
+        let response = "Not Found";
+        Ok(crate::response::Response::new(response.to_string()))
     }
 }
 
