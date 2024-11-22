@@ -19,6 +19,12 @@ async fn example_1() -> String {
     "run example_1".to_string()
 }
 
+async fn example_2(i: i32) -> String {
+    let string = format!("run example_2: {}", i);
+    println!("{}", string);
+    string
+}
+
 #[derive(Debug, Default)]
 pub struct ExampleHandler;
 
@@ -44,6 +50,27 @@ async fn world() -> String {
     "example_3".to_string()
 }
 
+
+#[derive(Debug, Default)]
+pub struct ExtraExample;
+
+impl Endpoint for ExtraExample {
+    fn call(
+        &self,
+        req: &mario_core::request::Request,
+    ) -> Pin<Box<dyn Future<Output = Result<Response<String>, Error>> + Send>> {
+        let copy_req = Arc::new(req.clone());
+        Box::pin(async move {
+            let query = copy_req.head.uri.query().unwrap_or_default();
+            info!("query: {:?}", query);
+            let response = example_2(1).await;
+            Ok(Response::new(response.to_string()))
+        })
+    }
+}
+
+
+
 #[tokio::main]
 pub async fn main() {
     // init trace log
@@ -55,6 +82,8 @@ pub async fn main() {
     let mut router: Router = Router::new();
 
     router.get("/hello_world", Arc::new(ExampleHandler));
+
+    router.get("/hello_world_param", Arc::new(ExtraExample));
 
     router.get("/hello_world_2", Arc::new(hello));
 
