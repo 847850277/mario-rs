@@ -88,11 +88,24 @@ struct Pagination {
     per_page: usize,
 }
 
-async fn page_handler(pagination: Query<Pagination>) -> &'static str {
+#[derive(Deserialize, Debug)]
+struct Pagination1 {
+    page_1: usize,
+    per_page_1: usize,
+}
+
+async fn page_handler(
+    pagination: Query<Pagination>,
+    pagination_1: Query<Pagination1>,
+) -> &'static str {
     let url = "localhost";
     let pagination: Pagination = pagination.0;
 
     println!("{:?}", pagination);
+
+    let pagination_1: Pagination1 = pagination_1.0;
+
+    println!("{:?}", pagination_1);
 
     "<h1>Hello, World!</h1>"
 }

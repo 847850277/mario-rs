@@ -119,76 +119,76 @@ where
 }
 
 // 异步的方法实现一个参数handler，如example里面的page_handler方法
-#[async_trait]
-impl<F, Fut, Res, B, T> Handler<B, (T,)> for F
-where
-    F: FnOnce(T) -> Fut + Clone + Send + Sync + 'static,
-    Fut: Future<Output = Res> + Send,
-    Res: IntoResponse,
-    T: crate::extract::FromRequest<B> + Send,
-    B: Send + 'static,
-{
-    type Sealed = sealed::Hidden;
-
-    async fn call(self, req: Request<B>) -> Response<BoxBody> {
-        //let res = self().await;
-        //res.into_response().map(box_body)
-        let mut req = crate::extract::RequestParts::new(req);
-        let value = match T::from_request(&mut req).await {
-            Ok(value) => value,
-            Err(rejection) => return rejection.into_response().map(box_body),
-        };
-        self(value).await.into_response().map(box_body)
-    }
-}
+// #[async_trait]
+// impl<F, Fut, Res, B, T> Handler<B, (T,)> for F
+// where
+//     F: FnOnce(T) -> Fut + Clone + Send + Sync + 'static,
+//     Fut: Future<Output = Res> + Send,
+//     Res: IntoResponse,
+//     T: crate::extract::FromRequest<B> + Send,
+//     B: Send + 'static,
+// {
+//     type Sealed = sealed::Hidden;
+//
+//     async fn call(self, req: Request<B>) -> Response<BoxBody> {
+//         //let res = self().await;
+//         //res.into_response().map(box_body)
+//         let mut req = crate::extract::RequestParts::new(req);
+//         let value = match T::from_request(&mut req).await {
+//             Ok(value) => value,
+//             Err(rejection) => return rejection.into_response().map(box_body),
+//         };
+//         self(value).await.into_response().map(box_body)
+//     }
+// }
 
 // 用宏实现多参数的支持
 // extract 支持
-// macro_rules! impl_handler {
-//     () => {
-//     };
-//
-//     ( $head:ident, $($tail:ident),* $(,)? ) => {
-//         #[async_trait]
-//         #[allow(non_snake_case)]
-//         impl<F, Fut, B, Res, $head, $($tail,)*> Handler<B, ($head, $($tail,)*)> for F
-//         where
-//             F: FnOnce($head, $($tail,)*) -> Fut + Clone + Send + Sync + 'static,
-//             Fut: Future<Output = Res> + Send,
-//             B: Send + 'static,
-//             Res: IntoResponse,
-//             B: Send + 'static,
-//             $head: FromRequest<B> + Send,
-//             $( $tail: FromRequest<B> + Send,)*
-//         {
-//             type Sealed = sealed::Hidden;
-//
-//             async fn call(self, req: Request<B>) -> Response<BoxBody> {
-//                 let mut req = crate::extract::RequestParts::new(req);
-//
-//                 let $head = match $head::from_request(&mut req).await {
-//                     Ok(value) => value,
-//                     Err(rejection) => return rejection.into_response().map(box_body),
-//                 };
-//
-//                 $(
-//                     let $tail = match $tail::from_request(&mut req).await {
-//                         Ok(value) => value,
-//                         Err(rejection) => return rejection.into_response().map(box_body),
-//                     };
-//                 )*
-//
-//                 let res = self($head, $($tail,)*).await;
-//
-//                 res.into_response().map(crate::body::box_body)
-//             }
-//         }
-//
-//         impl_handler!($($tail,)*);
-//     };
-// }
-//
-// impl_handler!(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16);
+macro_rules! impl_handler {
+    () => {
+    };
+
+    ( $head:ident, $($tail:ident),* $(,)? ) => {
+        #[async_trait]
+        #[allow(non_snake_case)]
+        impl<F, Fut, B, Res, $head, $($tail,)*> Handler<B, ($head, $($tail,)*)> for F
+        where
+            F: FnOnce($head, $($tail,)*) -> Fut + Clone + Send + Sync + 'static,
+            Fut: Future<Output = Res> + Send,
+            B: Send + 'static,
+            Res: IntoResponse,
+            B: Send + 'static,
+            $head: FromRequest<B> + Send,
+            $( $tail: FromRequest<B> + Send,)*
+        {
+            type Sealed = sealed::Hidden;
+
+            async fn call(self, req: Request<B>) -> Response<BoxBody> {
+                let mut req = crate::extract::RequestParts::new(req);
+
+                let $head = match $head::from_request(&mut req).await {
+                    Ok(value) => value,
+                    Err(rejection) => return rejection.into_response().map(box_body),
+                };
+
+                $(
+                    let $tail = match $tail::from_request(&mut req).await {
+                        Ok(value) => value,
+                        Err(rejection) => return rejection.into_response().map(box_body),
+                    };
+                )*
+
+                let res = self($head, $($tail,)*).await;
+
+                res.into_response().map(crate::body::box_body)
+            }
+        }
+
+        impl_handler!($($tail,)*);
+    };
+}
+
+impl_handler!(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16);
 
 // OnMethod 实现 Service
 impl<H, B, T, F> Service<Request<B>> for OnMethod<H, B, T, F>
