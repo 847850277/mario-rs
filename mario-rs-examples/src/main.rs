@@ -1,4 +1,4 @@
-use http_body_util::Full;
+use http_body_util::{BodyExt, Full};
 use log::info;
 use mario_core::error::Error;
 use mario_core::extra::{FailedToDeserializeQueryString, Query};
@@ -9,8 +9,11 @@ use mario_core::server::Server;
 use mario_core::service::Service;
 use mario_macro::handler;
 use std::future::Future;
+use std::ops::Deref;
 use std::pin::Pin;
 use std::sync::Arc;
+use warp::hyper;
+use warp::hyper::body;
 use warp::hyper::body::Bytes;
 
 async fn example() -> Response<String> {
@@ -129,6 +132,18 @@ impl Endpoint for ExtraMulti_2Example {
     }
 }
 
+#[derive(Debug, Default)]
+pub struct ExtraPostExample;
+
+impl Endpoint for ExtraPostExample {
+    fn call(&self, req: &mario_core::request::Request) -> Result<Response<String>, Error> {
+        dbg!(req);
+        let body = &req.body;
+        dbg!(body);
+        Ok(Response::new("not param".to_string()))
+    }
+}
+
 #[tokio::main]
 pub async fn main() {
     // init trace log
@@ -150,6 +165,8 @@ pub async fn main() {
     router.get("/hello_world_2", Arc::new(hello));
 
     router.get("/hello_world_3", Arc::new(world));
+
+    router.post("/hello_world_param", Arc::new(ExtraPostExample));
 
     server.service.set_routes(router);
 
