@@ -4,11 +4,13 @@ use std::future::Future;
 use std::pin::Pin;
 use std::sync::Arc;
 
-use http::Method;
+use http::{Method, Request};
+use hyper::body::Incoming;
 use route_recognizer::{Match, Params, Router as InternalRouter};
 
 use crate::error::Error;
 use crate::handler::Endpoint;
+use crate::response::Response;
 
 pub struct RouterMatch<'a> {
     pub handler: &'a dyn Endpoint,
@@ -21,10 +23,12 @@ struct NotFound;
 impl Endpoint for NotFound {
     fn call(
         &self,
-        _req: &crate::request::Request,
-    ) -> Result<crate::response::Response<String>, Error> {
-        let response = "Not Found";
-        Ok(crate::response::Response::new(response.to_string()))
+        _req: Request<Incoming>,
+    ) -> Pin<Box<dyn Future<Output = Result<Response<String>, Error>> + Send>> {
+        Box::pin(async move {
+            let response = "Not Found";
+            Ok(crate::response::Response::new(response.to_string()))
+        })
     }
 }
 

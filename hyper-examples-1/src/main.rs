@@ -5,6 +5,7 @@ use hyper::{Body, Request, Response, Server};
 use tokio::runtime::Runtime;
 
 async fn handle_request(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+    //req.into_parts();
     let mut body = req.into_body();
     let mut data = Vec::new();
 

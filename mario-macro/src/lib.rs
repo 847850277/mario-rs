@@ -27,12 +27,16 @@ fn generate_handler(_args: TokenStream, input: TokenStream) -> syn::Result<Token
         }
 
         impl Endpoint for #ident {
-            fn call(&self, req: &mario_core::request::Request) -> Result<Response<String>, Error>{
+            fn call(&self, req: Request<Incoming>) -> Pin<Box<dyn Future<Output = Result<Response<String>, Error>> + Send>>{
                 #item_fn
                 let fut = #ident();
-                let response = fut;
-                Ok(Response::new(response.to_string()))
+                // let response = fut;
+                // Ok(Response::new(response.to_string()))
 
+                 Box::pin(async move {
+                    let response = fut.await;
+                    Ok(Response::new(response.to_string()))
+                })
 
             }
         }
