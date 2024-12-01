@@ -7,10 +7,11 @@ edition.workspace = true
 tokio.workspace = true
 mario-core = { workspace = true }
 mario-macro = { workspace = true }
+hyper.workspace = true
+http-body.workspace = true
 http-body-util.workspace = true
 tracing-subscriber.workspace = true
 http.workspace = true
 log.workspace = true
-futures.workspace = true
 warp.workspace = true
 serde_urlencoded = "0.7.1"
