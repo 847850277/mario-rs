@@ -52,6 +52,8 @@ async fn dispatch(
     let router = service.get_routes();
     let router_match = router.route(request.uri().path(), request.method());
     let response = router_match.handler.call(request).await;
+    println!("test");
+    println!("{:?}", response);
     match response {
         Ok(response) => {
             let body = response.get_body().to_string();
